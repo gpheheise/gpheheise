@@ -62,10 +62,9 @@ These publications cover vulnerability analysis, exploitation concepts, practica
 
 ---
 
-## 📈 GitHub Stats
+## 🧩 Hack The Box
 
-![GitHub Stats](https://github-readme-stats.vercel.app/api?username=gpheheise&show_icons=true)
-![Top Languages](https://github-readme-stats.vercel.app/api/top-langs/?username=gpheheise&layout=compact)
+[![Hack The Box Card](assets/htb-card.svg)](https://app.hackthebox.com/public/users/378794)
 
 ---
 
