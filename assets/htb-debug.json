@@ -4,6 +4,20 @@
     "https://www.hackthebox.com/api/v4/profile/378794 -> HTTPError: HTTP Error 404: Not Found",
     "https://app.hackthebox.com/api/v4/profile/378794 -> JSONDecodeError: Expecting value: line 1 column 1 (char 0)"
   ],
-  "payload_type": "NoneType",
-  "payload_keys": null
+  "payload_type": null,
+  "top_level_keys": null,
+  "profile_keys": [],
+  "extracted": {
+    "username": null,
+    "rank": null,
+    "points": "\u2014",
+    "global_rank": "\u2014",
+    "flags": "\u2014",
+    "machines": "\u2014",
+    "challenges": "\u2014",
+    "prolabs": "\u2014/\u2014",
+    "miniprolabs": "\u2014/\u2014",
+    "fortresses": "\u2014/\u2014",
+    "completed": []
+  }
 }
