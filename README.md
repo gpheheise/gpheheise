@@ -1,6 +1,6 @@
 ![Matrix Banner](assets/matrix-banner.gif)
 
-# 👋 Hi, I’m Georg Ph. E. Heise
+# 👋 Hi, I’m Georg
 
 Senior Offensive Security Consultant specializing in offensive security engineering, penetration testing, and vulnerability research.  
 I focus on practical exploitation, responsible disclosure, and building security tooling for real-world environments.
