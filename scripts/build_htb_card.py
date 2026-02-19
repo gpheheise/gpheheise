@@ -1,137 +1,70 @@
 import html
 import json
 import pathlib
-import re
 import urllib.request
 from datetime import datetime
 from typing import Any
 
-HTB_USER_ID = "378794"
-HTB_URL = f"https://app.hackthebox.com/public/users/{HTB_USER_ID}"
-OUT_FILE = pathlib.Path("assets/htb-card.svg")
+HTB_ID = "378794"
 
+API_CANDIDATES = [
+    f"https://www.hackthebox.com/api/v4/profile/{HTB_ID}",
+    # sometimes endpoints differ; keep this as a fallback attempt
+    f"https://app.hackthebox.com/api/v4/profile/{HTB_ID}",
+]
 
-def fetch(url: str, accept: str = "text/html") -> str:
-    req = urllib.request.Request(
-        url,
-        headers={
-            "User-Agent": "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120 Safari/537.36",
-            "Accept": accept,
-            "Accept-Language": "en-US,en;q=0.9",
-        },
-    )
-    with urllib.request.urlopen(req, timeout=30) as r:
-        return r.read().decode("utf-8", errors="replace")
+PROFILE_URL = f"https://app.hackthebox.com/public/users/{HTB_ID}"
+
+OUT_SVG = pathlib.Path("assets/htb-card.svg")
+OUT_DEBUG = pathlib.Path("assets/htb-debug.json")
 
 
 def fetch_json(url: str) -> Any:
-    raw = fetch(url, accept="application/json")
-    return json.loads(raw)
+    req = urllib.request.Request(
+        url,
+        headers={
+            "User-Agent": "Mozilla/5.0 (GitHub Actions)",
+            "Accept": "application/json",
+        },
+    )
+    with urllib.request.urlopen(req, timeout=30) as r:
+        return json.loads(r.read().decode("utf-8", errors="replace"))
 
 
-def find_api_endpoint(page: str) -> str | None:
-    """
-    Try to locate a JSON endpoint in the HTML.
-    HTB often includes API calls like /api/v4/public/user/profile/<id> etc.
-    We'll search for common patterns.
-    """
-    candidates = []
-
-    # Common HTB API patterns (best-effort)
-    patterns = [
-        r'(["\'])(/api/[^"\']+%s[^"\']*)\1' % re.escape(HTB_USER_ID),
-        r'(["\'])(https://[^"\']+/api/[^"\']+%s[^"\']*)\1' % re.escape(HTB_USER_ID),
-        r'(["\'])(/api/[^"\']+public[^"\']+%s[^"\']*)\1' % re.escape(HTB_USER_ID),
-    ]
-
-    for pat in patterns:
-        for m in re.finditer(pat, page, flags=re.IGNORECASE):
-            url = m.group(2)
-            if url.startswith("/"):
-                url = "https://app.hackthebox.com" + url
-            candidates.append(url)
-
-    # Prefer endpoints that look like “profile” / “user” JSON
-    for preferred in candidates:
-        if any(k in preferred.lower() for k in ["profile", "user", "public"]):
-            return preferred
-
-    return candidates[0] if candidates else None
+def get(d: dict, *keys, default=None):
+    cur = d
+    for k in keys:
+        if not isinstance(cur, dict) or k not in cur:
+            return default
+        cur = cur[k]
+    return cur
 
 
-def walk(obj: Any):
-    if isinstance(obj, dict):
-        yield obj
-        for v in obj.values():
-            yield from walk(v)
-    elif isinstance(obj, list):
-        for v in obj:
-            yield from walk(v)
-
-
-def find_value(obj: Any, key_names: set[str]):
-    """Find first occurrence of any key in key_names in a nested JSON structure."""
-    for node in walk(obj):
-        for k in list(node.keys()):
-            if k in key_names and node[k] is not None:
-                return node[k]
-    return None
-
-
-def find_labs(obj: Any):
-    """
-    Try to find lab/prolab/fortress lists.
-    Returns dict with keys and lists if found.
-    """
-    out = {"prolabs": [], "miniprolabs": [], "fortresses": []}
-
-    for node in walk(obj):
-        if not isinstance(node, dict):
-            continue
-
-        # Heuristics: arrays of objects with 'name' and 'progress'/'percentage'
-        for k in ["prolabs", "proLabs", "pro_labs"]:
-            if k in node and isinstance(node[k], list):
-                out["prolabs"] = node[k]
-        for k in ["miniProLabs", "miniprolabs", "mini_pro_labs"]:
-            if k in node and isinstance(node[k], list):
-                out["miniprolabs"] = node[k]
-        for k in ["fortresses", "fortress"]:
-            if k in node and isinstance(node[k], list):
-                out["fortresses"] = node[k]
-
-    return out
+def esc(x: Any) -> str:
+    return html.escape(str(x))
 
 
 def matrix_svg(data: dict[str, Any]) -> str:
-    W, H = 980, 300
+    W, H = 980, 310
     pad = 28
 
-    username = data.get("username") or "0x01r3ddw4rf"
-    rank = data.get("rank") or "Pro Hacker"
+    username = data.get("username") or "Hack The Box"
+    rank = data.get("rank") or "—"
     points = data.get("points") or "—"
     global_rank = data.get("global_rank") or "—"
     flags = data.get("flags") or "—"
     machines = data.get("machines") or "—"
     challenges = data.get("challenges") or "—"
 
-    prolabs_done = data.get("prolabs_done") or "—"
-    prolabs_total = data.get("prolabs_total") or "—"
-    mini_done = data.get("mini_done") or "—"
-    mini_total = data.get("mini_total") or "—"
-    forts_done = data.get("forts_done") or "—"
-    forts_total = data.get("forts_total") or "—"
+    prolabs = data.get("prolabs") or "—/—"
+    miniprolabs = data.get("miniprolabs") or "—/—"
+    fortresses = data.get("fortresses") or "—/—"
 
-    completed_names = data.get("completed_names") or []
+    completed = data.get("completed") or []
+    completed = completed[:6]
+    completed_line = " · ".join(completed) if completed else "—"
 
     updated = datetime.utcnow().strftime("%Y-%m-%d %H:%M UTC")
-
-    def esc(x: str) -> str:
-        return html.escape(str(x))
-
-    # Render up to 6 completed items
-    completed_names = [str(x) for x in completed_names][:6]
-    completed_line = " · ".join(completed_names) if completed_names else "—"
 
     scanlines = "\n".join(
         f'<rect x="0" y="{y}" width="{W}" height="1" fill="#00ff41" opacity="0.05"/>'
@@ -164,7 +97,7 @@ def matrix_svg(data: dict[str, Any]) -> str:
   {scanlines}
 
   <text class="t h" x="{pad}" y="55" filter="url(#glow)">{esc(username)}</text>
-  <text class="t s muted" x="{pad}" y="78">{esc(rank)} · {esc(HTB_URL)}</text>
+  <text class="t s muted" x="{pad}" y="78">{esc(rank)} · {esc(PROFILE_URL)}</text>
 
   <text class="t k" x="{pad}" y="120">POINTS</text>
   <text class="t v" x="{pad}" y="145">{esc(points)}</text>
@@ -182,16 +115,16 @@ def matrix_svg(data: dict[str, Any]) -> str:
   <text class="t v" x="{pad+590}" y="145">{esc(challenges)}</text>
 
   <text class="t k" x="{pad}" y="190">PRO LABS</text>
-  <text class="t v" x="{pad}" y="215">{esc(prolabs_done)}/{esc(prolabs_total)}</text>
+  <text class="t v" x="{pad}" y="215">{esc(prolabs)}</text>
 
-  <text class="t k" x="{pad+170}" y="190">MINI PRO LABS</text>
-  <text class="t v" x="{pad+170}" y="215">{esc(mini_done)}/{esc(mini_total)}</text>
+  <text class="t k" x="{pad+200}" y="190">MINI PRO LABS</text>
+  <text class="t v" x="{pad+200}" y="215">{esc(miniprolabs)}</text>
 
-  <text class="t k" x="{pad+390}" y="190">FORTRESSES</text>
-  <text class="t v" x="{pad+390}" y="215">{esc(forts_done)}/{esc(forts_total)}</text>
+  <text class="t k" x="{pad+440}" y="190">FORTRESSES</text>
+  <text class="t v" x="{pad+440}" y="215">{esc(fortresses)}</text>
 
-  <text class="t k" x="{pad}" y="250">COMPLETED</text>
-  <text class="t s" x="{pad}" y="272">{esc(completed_line)}</text>
+  <text class="t k" x="{pad}" y="255">COMPLETED</text>
+  <text class="t s" x="{pad}" y="277">{esc(completed_line)}</text>
 
   <text class="t k muted" x="{pad}" y="{H-28}">updated {updated}</text>
 </svg>
@@ -201,90 +134,88 @@ def matrix_svg(data: dict[str, Any]) -> str:
 def main() -> None:
     pathlib.Path("assets").mkdir(parents=True, exist_ok=True)
 
-    page = fetch(HTB_URL)
-
-    api = find_api_endpoint(page)
     payload = None
-    if api:
+    errors = []
+    used_api = None
+
+    for api in API_CANDIDATES:
         try:
             payload = fetch_json(api)
-        except Exception:
-            payload = None
-
-    # Fallback: save the first 50k chars of HTML to debug
-    pathlib.Path("assets/htb-page-snippet.html").write_text(page[:50000], encoding="utf-8")
+            used_api = api
+            break
+        except Exception as e:
+            errors.append(f"{api} -> {type(e).__name__}: {e}")
 
     data: dict[str, Any] = {}
+    completed_names: list[str] = []
 
-    if payload:
-        pathlib.Path("assets/htb-api.json").write_text(json.dumps(payload)[:500000], encoding="utf-8")
+    if isinstance(payload, dict):
+        # many HTB responses are { "profile": {...} } or direct profile
+        prof = payload.get("profile") if isinstance(payload.get("profile"), dict) else payload
 
-        # Best-effort key searches
-        data["username"] = find_value(payload, {"username", "name", "handle"}) or "0x01r3ddw4rf"
-        data["rank"] = find_value(payload, {"rank", "rankName", "userRank"}) or "Pro Hacker"
-        data["points"] = find_value(payload, {"points", "userPoints"}) or "—"
-        data["global_rank"] = find_value(payload, {"globalRanking", "globalRank", "ranking"}) or "—"
-        data["flags"] = find_value(payload, {"flags", "totalFlags"}) or "—"
-        data["machines"] = find_value(payload, {"machines", "machinesSolved"}) or "—"
-        data["challenges"] = find_value(payload, {"challenges", "challengesSolved"}) or "—"
+        username = prof.get("name") or prof.get("username") or prof.get("handle")
+        rank = prof.get("rank") or prof.get("rank_name") or prof.get("rankName")
+        points = prof.get("points")
+        global_rank = prof.get("global_ranking") or prof.get("globalRanking") or prof.get("global_rank")
+        flags = prof.get("flags") or prof.get("total_flags") or prof.get("totalFlags")
+        machines = prof.get("machines") or prof.get("machines_owned") or prof.get("machinesOwned")
+        challenges = prof.get("challenges") or prof.get("challenges_solved") or prof.get("challengesSolved")
 
-        labs = find_labs(payload)
+        # labs counters (if present)
+        prolabs = prof.get("prolabs") or prof.get("proLabs")
+        miniprolabs = prof.get("mini_prolabs") or prof.get("miniProLabs")
+        fortresses = prof.get("fortresses")
 
-        # If lists exist, derive totals and completed names
-        completed = []
-        for group in ["prolabs", "miniprolabs", "fortresses"]:
-            for item in labs.get(group, []):
-                if not isinstance(item, dict):
-                    continue
-                name = item.get("name") or item.get("title")
-                pct = item.get("progress") or item.get("percentage") or item.get("completion")
-                if name is not None and pct is not None:
-                    try:
-                        pct_val = float(pct)
-                    except Exception:
-                        pct_val = None
-                    if pct_val is not None and pct_val >= 100:
-                        completed.append(name)
+        # labs lists (if present) - extract completed names
+        for key in ["prolabs_list", "proLabs", "prolabs", "fortresses", "miniProLabs"]:
+            v = prof.get(key)
+            if isinstance(v, list):
+                for item in v:
+                    if isinstance(item, dict):
+                        name = item.get("name") or item.get("title")
+                        pct = item.get("progress") or item.get("completion") or item.get("percentage")
+                        try:
+                            if name and pct is not None and float(pct) >= 100:
+                                completed_names.append(str(name))
+                        except Exception:
+                            pass
 
-        data["completed_names"] = completed
-
-        # Try to find the counters (done/total) in payload, else compute
-        # (We compute from lists if present)
-        def done_total(items):
-            if not items:
-                return None, None
-            total = len(items)
-            done = 0
-            for item in items:
-                if isinstance(item, dict):
-                    pct = item.get("progress") or item.get("percentage") or item.get("completion")
-                    try:
-                        if pct is not None and float(pct) >= 100:
-                            done += 1
-                    except Exception:
-                        pass
-            return done, total
-
-        d, t = done_total(labs.get("prolabs", []))
-        if d is not None:
-            data["prolabs_done"], data["prolabs_total"] = d, t
-
-        d, t = done_total(labs.get("miniprolabs", []))
-        if d is not None:
-            data["mini_done"], data["mini_total"] = d, t
-
-        d, t = done_total(labs.get("fortresses", []))
-        if d is not None:
-            data["forts_done"], data["forts_total"] = d, t
-    else:
-        # Minimal fallback (still renders a card)
         data = {
-            "username": "0x01r3ddw4rf",
-            "rank": "Pro Hacker",
+            "username": username,
+            "rank": rank,
+            "points": points,
+            "global_rank": global_rank,
+            "flags": flags,
+            "machines": machines,
+            "challenges": challenges,
+            "prolabs": prolabs if isinstance(prolabs, str) else (None),
+            "miniprolabs": miniprolabs if isinstance(miniprolabs, str) else (None),
+            "fortresses": fortresses if isinstance(fortresses, str) else (None),
+            "completed": completed_names,
         }
 
-    OUT_FILE.write_text(matrix_svg(data), encoding="utf-8")
-    print(f"Wrote {OUT_FILE}")
+        # If counters are numbers like {"done":5,"total":10}, format them
+        def fmt_counter(x):
+            if isinstance(x, dict) and "done" in x and "total" in x:
+                return f"{x['done']}/{x['total']}"
+            return x
+
+        data["prolabs"] = fmt_counter(prolabs) or "—/—"
+        data["miniprolabs"] = fmt_counter(miniprolabs) or "—/—"
+        data["fortresses"] = fmt_counter(fortresses) or "—/—"
+
+    # Always write debug so we can tune keys fast
+    OUT_DEBUG.write_text(
+        json.dumps(
+            {"used_api": used_api, "errors": errors, "payload_type": type(payload).__name__, "payload_keys": list(payload.keys()) if isinstance(payload, dict) else None},
+            indent=2,
+        ),
+        encoding="utf-8",
+    )
+
+    OUT_SVG.write_text(matrix_svg(data), encoding="utf-8")
+    print(f"Wrote {OUT_SVG}")
+    print(f"Wrote {OUT_DEBUG}")
 
 
 if __name__ == "__main__":
