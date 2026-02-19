@@ -116,7 +116,7 @@ If you’re organizing a meetup or conference, I’m open to speaking opportunit
 
 - 💼 LinkedIn: https://www.linkedin.com/in/georgpheheise/  
 - ✍ Medium: https://medium.com/@gpheheise  
-- 🐙 GitHub: https://github.com/gpheheise  
+- 🐙 X: https://x.com/gpheheise 
 
 ---
 
