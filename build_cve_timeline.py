@@ -1,0 +1,43 @@
+name: Build CVE timeline
+
+on:
+  schedule:
+    - cron: "0 7 * * 1" # Mondays
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          persist-credentials: true
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Generate SVG
+        run: |
+          python scripts/build_cve_timeline.py
+          ls -la assets || true
+          git status --porcelain
+
+      - name: Commit & push if changed
+        run: |
+          if [[ -z "$(git status --porcelain)" ]]; then
+            echo "No changes to commit."
+            exit 0
+          fi
+
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add assets/cve-timeline.svg
+          git commit -m "Update CVE timeline"
+          git push
