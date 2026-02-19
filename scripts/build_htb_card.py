@@ -5,7 +5,7 @@ import pathlib
 import re
 import urllib.request
 from datetime import datetime
-from typing import Any, Optional, Tuple
+from typing import Any, Optional
 
 
 HTB_USER_ID = "378794"
@@ -17,6 +17,34 @@ OUT_DEBUG = pathlib.Path("assets/htb-debug.json")
 BASIC_ENDPOINT = f"https://labs.hackthebox.com/api/v4/user/profile/basic/{HTB_USER_ID}"
 PROLAB_ENDPOINT = "https://labs.hackthebox.com/api/v4/prolabs"
 FORTRESS_ENDPOINT = "https://labs.hackthebox.com/api/v4/fortresses"
+CHALLENGE_LIST_ENDPOINT = "https://labs.hackthebox.com/api/v4/challenge/list"
+
+# Season endpoints are still elusive. We probe a wider set across multiple HTB domains.
+SEASON_CANDIDATES = [
+    # labs.*
+    "https://labs.hackthebox.com/api/v4/seasons",
+    "https://labs.hackthebox.com/api/v4/season",
+    "https://labs.hackthebox.com/api/v4/seasons/me",
+    "https://labs.hackthebox.com/api/v4/season/me",
+    "https://labs.hackthebox.com/api/v4/seasons/current",
+    "https://labs.hackthebox.com/api/v4/season/current",
+    f"https://labs.hackthebox.com/api/v4/seasons/profile/{HTB_USER_ID}",
+    f"https://labs.hackthebox.com/api/v4/season/profile/{HTB_USER_ID}",
+    "https://labs.hackthebox.com/api/v4/competitive/seasons",
+    "https://labs.hackthebox.com/api/v4/competitive/season",
+    "https://labs.hackthebox.com/api/v4/seasonal",
+    "https://labs.hackthebox.com/api/v4/seasonal/me",
+    f"https://labs.hackthebox.com/api/v4/user/{HTB_USER_ID}/seasons",
+    f"https://labs.hackthebox.com/api/v4/user/seasons/{HTB_USER_ID}",
+    # app.*
+    "https://app.hackthebox.com/api/v4/seasons",
+    "https://app.hackthebox.com/api/v4/seasons/me",
+    "https://app.hackthebox.com/api/v4/seasons/current",
+    # www.*
+    "https://www.hackthebox.com/api/v4/seasons",
+    "https://www.hackthebox.com/api/v4/seasons/me",
+    "https://www.hackthebox.com/api/v4/seasons/current",
+]
 
 
 def fetch_json(url: str, token: str) -> Any:
@@ -40,6 +68,16 @@ def try_json(url: str, token: str) -> tuple[bool, Any, str]:
         return False, None, f"{type(e).__name__}: {e}"
 
 
+def walk(obj: Any):
+    if isinstance(obj, dict):
+        yield obj
+        for v in obj.values():
+            yield from walk(v)
+    elif isinstance(obj, list):
+        for v in obj:
+            yield from walk(v)
+
+
 def fmt_num(x: Any) -> str:
     if x is None or isinstance(x, bool):
         return "—"
@@ -59,16 +97,6 @@ def fmt_counter(done: Any, total: Any) -> str:
         return f"{int(float(done))}/{int(float(total))}"
     except Exception:
         return "—/—"
-
-
-def walk(obj: Any):
-    if isinstance(obj, dict):
-        yield obj
-        for v in obj.values():
-            yield from walk(v)
-    elif isinstance(obj, list):
-        for v in obj:
-            yield from walk(v)
 
 
 def extract_list(payload: Any) -> Optional[list[dict]]:
@@ -108,7 +136,7 @@ def extract_done_total_from_list(items: list[dict]) -> tuple[int, int, list[str]
         name = it.get("name") or it.get("title")
 
         # completion fields seen across HTB payloads
-        flags = [
+        fields = [
             it.get("ownership"),
             it.get("progress"),
             it.get("percentage"),
@@ -119,7 +147,7 @@ def extract_done_total_from_list(items: list[dict]) -> tuple[int, int, list[str]
         ]
 
         pct_val = None
-        for f in flags:
+        for f in fields:
             if isinstance(f, bool):
                 pct_val = 100.0 if f else 0.0
                 break
@@ -147,24 +175,60 @@ def merge_unique(a: list[str], b: list[str]) -> list[str]:
     return out
 
 
-def pick_first_working(token: str, urls: list[str], debug_bucket: dict) -> tuple[str, Any]:
-    errs = []
+def probe_first_working(token: str, urls: list[str]) -> tuple[Optional[str], Any, list[str]]:
+    errs: list[str] = []
     for u in urls:
         ok, payload, err = try_json(u, token)
         if ok:
-            debug_bucket["used"] = u
-            debug_bucket["ok"] = True
-            debug_bucket["errors"] = errs
-            return u, payload
+            return u, payload, errs
         errs.append(f"{u} -> {err}")
-    debug_bucket["used"] = None
-    debug_bucket["ok"] = False
-    debug_bucket["errors"] = errs
-    return "", None
+    return None, None, errs
+
+
+def find_season_fields(payload: Any) -> tuple[str, str, str]:
+    rk = pts = None
+    flags_solved = flags_total = None
+
+    for node in walk(payload):
+        if not isinstance(node, dict):
+            continue
+        rk = rk or node.get("seasonRank") or node.get("season_rank") or node.get("seasonalRanking") or node.get("ranking") or node.get("rank")
+        pts = pts or node.get("seasonPoints") or node.get("season_points") or node.get("points") or node.get("score")
+        flags_solved = flags_solved or node.get("flags") or node.get("flagsOwned") or node.get("solvedFlags")
+        flags_total = flags_total or node.get("flagsTotal") or node.get("totalFlags") or node.get("maxFlags")
+
+    season_rank = fmt_num(rk)
+    season_points = fmt_num(pts)
+    season_flags = "—/—"
+    if flags_solved is not None and flags_total is not None:
+        season_flags = fmt_counter(flags_solved, flags_total)
+
+    return season_rank, season_points, season_flags
+
+
+def wrap_names(names: list[str], max_chars: int = 92) -> list[str]:
+    """
+    Wrap a list of names into multiple lines of roughly max_chars length.
+    """
+    if not names:
+        return ["—"]
+
+    lines: list[str] = []
+    cur = ""
+    for name in names:
+        chunk = name if cur == "" else f"{cur} · {name}"
+        if len(chunk) <= max_chars:
+            cur = chunk
+        else:
+            lines.append(cur if cur else name)
+            cur = name
+    if cur:
+        lines.append(cur)
+    return lines
 
 
 def svg_card(base: dict[str, Any], extras: dict[str, Any]) -> str:
-    W, H = 1080, 360
+    W = 1080
     pad = 28
 
     name = base.get("name") or "Hack The Box"
@@ -177,15 +241,18 @@ def svg_card(base: dict[str, Any], extras: dict[str, Any]) -> str:
 
     challenges = extras.get("challenges", "—/—")
     prolabs = extras.get("prolabs", "—/—")
-    miniprolabs = extras.get("miniprolabs", "—/—")
     fortresses = extras.get("fortresses", "—/—")
 
     season_rank = extras.get("season_rank", "—")
     season_points = extras.get("season_points", "—")
     season_flags = extras.get("season_flags", "—/—")
 
-    completed = extras.get("completed", [])
-    completed_line = " · ".join(completed[:12]) if completed else "—"
+    completed_lines = wrap_names(extras.get("completed", []), max_chars=98)
+
+    # Dynamic height based on completed lines
+    base_h = 320
+    per_line = 18
+    H = base_h + max(0, (len(completed_lines) - 1)) * per_line + 30
 
     updated = datetime.utcnow().strftime("%Y-%m-%d %H:%M UTC")
 
@@ -196,6 +263,13 @@ def svg_card(base: dict[str, Any], extras: dict[str, Any]) -> str:
         f'<rect x="0" y="{y}" width="{W}" height="1" fill="#00ff41" opacity="0.05"/>'
         for y in range(0, H, 4)
     )
+
+    # Completed text lines
+    y0 = 285
+    completed_svg = []
+    for i, line in enumerate(completed_lines):
+        completed_svg.append(f'<text class="t s" x="{pad}" y="{y0 + i * per_line}">{esc(line)}</text>')
+    completed_svg_str = "\n  ".join(completed_svg)
 
     return f'''<svg xmlns="http://www.w3.org/2000/svg" width="{W}" height="{H}" viewBox="0 0 {W} {H}">
   <defs>
@@ -246,17 +320,14 @@ def svg_card(base: dict[str, Any], extras: dict[str, Any]) -> str:
   <text class="t k" x="{pad}" y="195">PRO LABS</text>
   <text class="t v" x="{pad}" y="220">{esc(prolabs)}</text>
 
-  <text class="t k" x="{pad+170}" y="195">MINI PRO LABS</text>
-  <text class="t v" x="{pad+170}" y="220">{esc(miniprolabs)}</text>
+  <text class="t k" x="{pad+240}" y="195">FORTRESSES</text>
+  <text class="t v" x="{pad+240}" y="220">{esc(fortresses)}</text>
 
-  <text class="t k" x="{pad+400}" y="195">FORTRESSES</text>
-  <text class="t v" x="{pad+400}" y="220">{esc(fortresses)}</text>
+  <text class="t k" x="{pad+480}" y="195">SEASON</text>
+  <text class="t v" x="{pad+480}" y="220">#{esc(season_rank)} · {esc(season_points)} pts · {esc(season_flags)} flags</text>
 
-  <text class="t k" x="{pad+610}" y="195">SEASON</text>
-  <text class="t v" x="{pad+610}" y="220">#{esc(season_rank)} · {esc(season_points)} pts · {esc(season_flags)} flags</text>
-
-  <text class="t k" x="{pad}" y="265">COMPLETED</text>
-  <text class="t s" x="{pad}" y="288">{esc(completed_line)}</text>
+  <text class="t k" x="{pad}" y="265">COMPLETED PRO LABS</text>
+  {completed_svg_str}
 
   <text class="t k muted" x="{pad}" y="{H-28}">updated {updated}</text>
 </svg>
@@ -274,8 +345,7 @@ def main() -> None:
         "basic": {},
         "prolabs": {},
         "fortresses": {},
-        "miniprolabs_probe": {},
-        "challenges_probe": {},
+        "challenges": {},
         "season_probe": {},
         "extras": {},
     }
@@ -286,12 +356,10 @@ def main() -> None:
     if not ok or not isinstance(base_payload, dict):
         OUT_DEBUG.write_text(json.dumps(debug, indent=2), encoding="utf-8")
         raise SystemExit("Failed to fetch basic profile payload.")
-
     base = base_payload.get("profile") if isinstance(base_payload.get("profile"), dict) else base_payload
 
     extras: dict[str, Any] = {
         "prolabs": "—/—",
-        "miniprolabs": "—/—",
         "fortresses": "—/—",
         "completed": [],
         "challenges": "—/—",
@@ -316,59 +384,17 @@ def main() -> None:
     if ok:
         items = extract_list(payload)
         if items:
-            done, total, comp = extract_done_total_from_list(items)
+            done, total, _ = extract_done_total_from_list(items)
             extras["fortresses"] = fmt_counter(done, total)
-            extras["completed"] = merge_unique(extras["completed"], comp)
 
-    # MINI PROLABS / ENDGAMES PROBE (we’ll try a smart shortlist)
-    miniprolab_candidates = [
-        "https://labs.hackthebox.com/api/v4/minipro-labs",
-        "https://labs.hackthebox.com/api/v4/mini-pro-labs",
-        "https://labs.hackthebox.com/api/v4/mini-prolabs",
-        "https://labs.hackthebox.com/api/v4/miniprolabs",
-        "https://labs.hackthebox.com/api/v4/prolabs/mini",
-        "https://labs.hackthebox.com/api/v4/prolabs/mini-pro-labs",
-        # legacy-ish naming (often still exists behind the scenes)
-        "https://labs.hackthebox.com/api/v4/endgames",
-        "https://labs.hackthebox.com/api/v4/endgame",
-        "https://labs.hackthebox.com/api/v4/endgames/list",
-    ]
-    used, mini_payload = pick_first_working(token, miniprolab_candidates, debug["miniprolabs_probe"])
-    if used and mini_payload is not None:
-        items = extract_list(mini_payload)
+    # CHALLENGES (active counter; you confirmed 23/188 and it looks right)
+    ok, payload, err = try_json(CHALLENGE_LIST_ENDPOINT, token)
+    debug["challenges"] = {"used": CHALLENGE_LIST_ENDPOINT, "ok": ok, "error": err}
+    if ok:
+        items = extract_list(payload)
         if items:
-            done, total, comp = extract_done_total_from_list(items)
-            extras["miniprolabs"] = fmt_counter(done, total)
-            extras["completed"] = merge_unique(extras["completed"], comp)
-
-    # CHALLENGES PROBE (solved/total)
-    challenges_candidates = [
-        "https://labs.hackthebox.com/api/v4/challenge/list",
-        "https://labs.hackthebox.com/api/v4/challenges/list",
-        "https://labs.hackthebox.com/api/v4/challenge/list?limit=10000",
-        "https://labs.hackthebox.com/api/v4/challenges/list?limit=10000",
-        f"https://labs.hackthebox.com/api/v4/user/profile/challenges/{HTB_USER_ID}",
-        f"https://labs.hackthebox.com/api/v4/user/challenges/{HTB_USER_ID}",
-        f"https://labs.hackthebox.com/api/v4/user/profile/progress/{HTB_USER_ID}",
-    ]
-    used, chall_payload = pick_first_working(token, challenges_candidates, debug["challenges_probe"])
-    if used and chall_payload is not None:
-        solved = None
-        total = None
-
-        # direct counters (if they exist)
-        if isinstance(chall_payload, dict):
-            for node in walk(chall_payload):
-                if not isinstance(node, dict):
-                    continue
-                solved = solved or node.get("solved") or node.get("completed") or node.get("solvedChallenges") or node.get("challenge_owns")
-                total = total or node.get("total") or node.get("totalChallenges") or node.get("challengesTotal")
-
-        # list fallback
-        items = extract_list(chall_payload)
-        if items:
-            total = total or len(items)
-            solved = solved or sum(
+            total = len(items)
+            solved = sum(
                 1
                 for it in items
                 if isinstance(it, dict)
@@ -379,41 +405,16 @@ def main() -> None:
                     or it.get("isCompleted") is True
                 )
             )
+            extras["challenges"] = fmt_counter(solved, total)
 
-        extras["challenges"] = fmt_counter(solved, total)
-
-    # SEASON PROBE
-    season_candidates = [
-        "https://labs.hackthebox.com/api/v4/seasons",
-        "https://labs.hackthebox.com/api/v4/season",
-        "https://labs.hackthebox.com/api/v4/seasons/me",
-        "https://labs.hackthebox.com/api/v4/season/me",
-        f"https://labs.hackthebox.com/api/v4/seasons/profile/{HTB_USER_ID}",
-        f"https://labs.hackthebox.com/api/v4/season/profile/{HTB_USER_ID}",
-        "https://labs.hackthebox.com/api/v4/competitive/seasons",
-        "https://labs.hackthebox.com/api/v4/competitive/season",
-        "https://labs.hackthebox.com/api/v4/seasonal",
-        "https://labs.hackthebox.com/api/v4/seasonal/me",
-    ]
-    used, season_payload = pick_first_working(token, season_candidates, debug["season_probe"])
+    # SEASON PROBE (still hunting)
+    used, season_payload, errs = probe_first_working(token, SEASON_CANDIDATES)
+    debug["season_probe"] = {"used": used, "errors": errs}
     if used and season_payload is not None:
-        rk = None
-        pts = None
-        flags_solved = None
-        flags_total = None
-
-        for node in walk(season_payload):
-            if not isinstance(node, dict):
-                continue
-            rk = rk or node.get("seasonRank") or node.get("season_rank") or node.get("ranking") or node.get("rank")
-            pts = pts or node.get("seasonPoints") or node.get("season_points") or node.get("points") or node.get("score")
-            flags_solved = flags_solved or node.get("flags") or node.get("flagsOwned") or node.get("solvedFlags")
-            flags_total = flags_total or node.get("flagsTotal") or node.get("totalFlags") or node.get("maxFlags")
-
-        extras["season_rank"] = fmt_num(rk)
-        extras["season_points"] = fmt_num(pts)
-        if flags_solved is not None and flags_total is not None:
-            extras["season_flags"] = fmt_counter(flags_solved, flags_total)
+        sr, sp, sf = find_season_fields(season_payload)
+        extras["season_rank"] = sr
+        extras["season_points"] = sp
+        extras["season_flags"] = sf
 
     debug["extras"] = extras
     OUT_DEBUG.write_text(json.dumps(debug, indent=2), encoding="utf-8")
