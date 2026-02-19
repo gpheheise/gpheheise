@@ -112,11 +112,23 @@ If you’re organizing a meetup or conference, I’m open to speaking opportunit
 
 ---
 
-## 📫 Connect
+## 📬 Connect
 
-- 💼 LinkedIn: https://www.linkedin.com/in/georgpheheise/  
-- ✍ Medium: https://medium.com/@gpheheise  
-- 🐙 X: https://x.com/gpheheise 
+<div align="left">
+
+<a href="https://www.linkedin.com/in/georgpheheise/" target="_blank">
+  <img src="https://img.shields.io/badge/LinkedIn-0A66C2?style=for-the-badge&logo=linkedin&logoColor=white" />
+</a>
+
+<a href="https://medium.com/@gpheheise" target="_blank">
+  <img src="https://img.shields.io/badge/Medium-000000?style=for-the-badge&logo=medium&logoColor=white" />
+</a>
+
+<a href="https://x.com/gpheheise" target="_blank">
+  <img src="https://img.shields.io/badge/X-000000?style=for-the-badge&logo=x&logoColor=white" />
+</a>
+
+</div>
 
 ---
 
