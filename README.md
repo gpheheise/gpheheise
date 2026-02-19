@@ -9,7 +9,7 @@ I focus on practical exploitation, responsible disclosure, and building security
 <!-- MEET ME NEXT -->
 <div align="center">
   <a href="https://insomnihack.ch/" target="_blank" rel="noopener">
-    <img src="assets/events/insomnihack-logo.png" alt="Insomni'hack" height="60" />
+    <img src="assets/insomnihack-logo.png" alt="Insomni'hack" height="60" />
   </a>
 
   <h2>Meet me next: Insomni’hack — Lausanne 🇨🇭 (March)</h2>
