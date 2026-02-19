@@ -66,14 +66,13 @@ I’ve presented research and technical work across multiple security communitie
 If you’re organizing a meetup or conference, I’m open to speaking opportunities.
 
 **Recent / notable appearances (sample):**
-- Conference A — Talk title (Year)
-- Conference B — Talk title (Year)
-- Meetup C — Topic (Year)
+- Bsides Dresden — The AI Ad Apocalypse Unmasking Youtube Ads That Drain macOS Crypto Wallets (2025)
+- Bsides Tirana — Breaking Bad AD - What Red Teams Wish You'd Fix Yesterday (2025)
+
 
 <div align="center">
-  <img src="assets/confs/bsides.png" height="42" alt="BSides" />
-  <img src="assets/confs/insomnihack.png" height="42" alt="Insomni'hack" />
-  <img src="assets/confs/xxx.png" height="42" alt="Conference" />
+  <img src="assets/confs/bsidestirana.png" height="42" alt="BSides" />
+  <img src="assets/confs/bsidesdresden.png" height="42" alt="Conference" />
 </div>
 
 ## 🛠 Technical Expertise
