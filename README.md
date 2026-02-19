@@ -71,8 +71,8 @@ If you’re organizing a meetup or conference, I’m open to speaking opportunit
 
 
 <div align="center">
-  <img src="assets/confs/bsidestirana.png" height="42" alt="BSides" />
-  <img src="assets/confs/bsidesdresden.png" height="42" alt="Conference" />
+  <img src="assets/confs/bsidestirana.png" height="84" alt="BSides" />
+  <img src="assets/confs/bsidesdresden.png" height="84" alt="Conference" />
 </div>
 
 ## 🛠 Technical Expertise
