@@ -1,4 +1,5 @@
 ![Header](https://capsule-render.vercel.app/api?type=waving&height=220&section=header&text=Georg%20Ph.%20E.%20Heise&fontSize=42&desc=Offensive%20Security%20%7C%20Vulnerability%20Research%20%7C%20Penetration%20Testing&descSize=18&animation=fadeIn)
+
 # 👋 Hi, I’m Georg Ph. E. Heise
 
 Senior Offensive Security Consultant specializing in offensive security engineering, penetration testing, and vulnerability research.  
