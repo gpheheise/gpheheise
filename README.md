@@ -1,6 +1,6 @@
 ![Matrix Banner](assets/matrix-banner1.gif)
 
-# 👋 Hi, I’m Georg aka 0x01r3ddw4rf
+# 👋 Hi, I’m Georg (aka 0x01r3ddw4rf)
 
 Senior Offensive Security Consultant specializing in offensive security engineering, penetration testing, and vulnerability research.  
 I focus on practical exploitation, responsible disclosure, and building security tooling for real-world environments.
