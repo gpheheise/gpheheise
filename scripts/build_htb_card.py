@@ -4,6 +4,7 @@ import os
 import pathlib
 import re
 import urllib.request
+import urllib.error
 from datetime import datetime
 from typing import Any, Optional
 
@@ -19,63 +20,43 @@ PROLAB_ENDPOINT = "https://labs.hackthebox.com/api/v4/prolabs"
 FORTRESS_ENDPOINT = "https://labs.hackthebox.com/api/v4/fortresses"
 CHALLENGE_LIST_ENDPOINT = "https://labs.hackthebox.com/api/v4/challenge/list"
 
-# Season endpoints are still elusive. We probe a wider set across multiple HTB domains.
-SEASON_CANDIDATES = [
-    # labs.*
-    "https://labs.hackthebox.com/api/v4/seasons",
-    "https://labs.hackthebox.com/api/v4/season",
-    "https://labs.hackthebox.com/api/v4/seasons/me",
-    "https://labs.hackthebox.com/api/v4/season/me",
-    "https://labs.hackthebox.com/api/v4/seasons/current",
-    "https://labs.hackthebox.com/api/v4/season/current",
-    f"https://labs.hackthebox.com/api/v4/seasons/profile/{HTB_USER_ID}",
-    f"https://labs.hackthebox.com/api/v4/season/profile/{HTB_USER_ID}",
-    "https://labs.hackthebox.com/api/v4/competitive/seasons",
-    "https://labs.hackthebox.com/api/v4/competitive/season",
-    "https://labs.hackthebox.com/api/v4/seasonal",
-    "https://labs.hackthebox.com/api/v4/seasonal/me",
-    f"https://labs.hackthebox.com/api/v4/user/{HTB_USER_ID}/seasons",
-    f"https://labs.hackthebox.com/api/v4/user/seasons/{HTB_USER_ID}",
-    # app.*
-    "https://app.hackthebox.com/api/v4/seasons",
-    "https://app.hackthebox.com/api/v4/seasons/me",
-    "https://app.hackthebox.com/api/v4/seasons/current",
-    # www.*
-    "https://www.hackthebox.com/api/v4/seasons",
-    "https://www.hackthebox.com/api/v4/seasons/me",
-    "https://www.hackthebox.com/api/v4/seasons/current",
-]
+# ✅ Seasons endpoint you found
+SEASON_RANKS_ENDPOINT = f"https://labs.hackthebox.com/api/v4/season/user/{HTB_USER_ID}/ranks"
 
 
-def fetch_json(url: str, token: str) -> Any:
+def fetch_raw(url: str, token: str) -> tuple[int, str, str]:
     req = urllib.request.Request(
         url,
         headers={
             "User-Agent": "Mozilla/5.0 (GitHub Actions)",
-            "Accept": "application/json",
+            "Accept": "application/json,text/plain,*/*",
             "Authorization": f"Bearer {token}",
         },
     )
-    with urllib.request.urlopen(req, timeout=30) as r:
-        raw = r.read().decode("utf-8", errors="replace")
-        return json.loads(raw)
-
-
-def try_json(url: str, token: str) -> tuple[bool, Any, str]:
     try:
-        return True, fetch_json(url, token), ""
-    except Exception as e:
-        return False, None, f"{type(e).__name__}: {e}"
+        with urllib.request.urlopen(req, timeout=30) as r:
+            status = getattr(r, "status", 200)
+            ctype = r.headers.get("Content-Type", "")
+            body = r.read().decode("utf-8", errors="replace")
+            return status, ctype, body
+    except urllib.error.HTTPError as e:
+        ctype = e.headers.get("Content-Type", "") if e.headers else ""
+        body = e.read().decode("utf-8", errors="replace") if hasattr(e, "read") else ""
+        return e.code, ctype, body
 
 
-def walk(obj: Any):
-    if isinstance(obj, dict):
-        yield obj
-        for v in obj.values():
-            yield from walk(v)
-    elif isinstance(obj, list):
-        for v in obj:
-            yield from walk(v)
+def try_json(url: str, token: str) -> tuple[bool, Any, dict]:
+    status, ctype, body = fetch_raw(url, token)
+    meta = {
+        "url": url,
+        "status": status,
+        "content_type": ctype,
+        "snippet": body[:220],
+    }
+    try:
+        return True, json.loads(body), meta
+    except Exception:
+        return False, None, meta
 
 
 def fmt_num(x: Any) -> str:
@@ -99,12 +80,20 @@ def fmt_counter(done: Any, total: Any) -> str:
         return "—/—"
 
 
+def walk(obj: Any):
+    if isinstance(obj, dict):
+        yield obj
+        for v in obj.values():
+            yield from walk(v)
+    elif isinstance(obj, list):
+        for v in obj:
+            yield from walk(v)
+
+
 def extract_list(payload: Any) -> Optional[list[dict]]:
-    # direct list
     if isinstance(payload, list) and payload and all(isinstance(x, dict) for x in payload):
         return payload
 
-    # common wrappers
     if isinstance(payload, dict):
         for k in ("data", "items", "result", "list", "labs", "entries"):
             v = payload.get(k)
@@ -116,7 +105,6 @@ def extract_list(payload: Any) -> Optional[list[dict]]:
                     if isinstance(vv, list) and vv and all(isinstance(x, dict) for x in vv):
                         return vv
 
-    # deep fallback: first list of dicts containing a name/title
     for node in walk(payload):
         if isinstance(node, dict):
             for v in node.values():
@@ -134,8 +122,6 @@ def extract_done_total_from_list(items: list[dict]) -> tuple[int, int, list[str]
 
     for it in items:
         name = it.get("name") or it.get("title")
-
-        # completion fields seen across HTB payloads
         fields = [
             it.get("ownership"),
             it.get("progress"),
@@ -175,44 +161,9 @@ def merge_unique(a: list[str], b: list[str]) -> list[str]:
     return out
 
 
-def probe_first_working(token: str, urls: list[str]) -> tuple[Optional[str], Any, list[str]]:
-    errs: list[str] = []
-    for u in urls:
-        ok, payload, err = try_json(u, token)
-        if ok:
-            return u, payload, errs
-        errs.append(f"{u} -> {err}")
-    return None, None, errs
-
-
-def find_season_fields(payload: Any) -> tuple[str, str, str]:
-    rk = pts = None
-    flags_solved = flags_total = None
-
-    for node in walk(payload):
-        if not isinstance(node, dict):
-            continue
-        rk = rk or node.get("seasonRank") or node.get("season_rank") or node.get("seasonalRanking") or node.get("ranking") or node.get("rank")
-        pts = pts or node.get("seasonPoints") or node.get("season_points") or node.get("points") or node.get("score")
-        flags_solved = flags_solved or node.get("flags") or node.get("flagsOwned") or node.get("solvedFlags")
-        flags_total = flags_total or node.get("flagsTotal") or node.get("totalFlags") or node.get("maxFlags")
-
-    season_rank = fmt_num(rk)
-    season_points = fmt_num(pts)
-    season_flags = "—/—"
-    if flags_solved is not None and flags_total is not None:
-        season_flags = fmt_counter(flags_solved, flags_total)
-
-    return season_rank, season_points, season_flags
-
-
-def wrap_names(names: list[str], max_chars: int = 92) -> list[str]:
-    """
-    Wrap a list of names into multiple lines of roughly max_chars length.
-    """
+def wrap_names(names: list[str], max_chars: int = 98) -> list[str]:
     if not names:
         return ["—"]
-
     lines: list[str] = []
     cur = ""
     for name in names:
@@ -225,6 +176,50 @@ def wrap_names(names: list[str], max_chars: int = 92) -> list[str]:
     if cur:
         lines.append(cur)
     return lines
+
+
+def parse_latest_season(season_payload: Any) -> dict[str, str]:
+    """
+    Expected shape:
+      {"data":[{...latest season...}, {...older...}]}
+    We take the first element if present.
+    """
+    out = {
+        "season_name": "—",
+        "season_league": "—",
+        "season_rank": "—",
+        "season_total_ranks": "—",
+        "season_points": "—",
+        "season_flags": "—/—",
+        "season_next_flags": "—/—",
+    }
+
+    data = None
+    if isinstance(season_payload, dict) and isinstance(season_payload.get("data"), list):
+        data = season_payload["data"]
+
+    if not data:
+        return out
+
+    latest = data[0] if isinstance(data[0], dict) else None
+    if not latest:
+        return out
+
+    out["season_name"] = str(latest.get("season_name") or "—")
+    out["season_league"] = str(latest.get("league") or "—")
+    out["season_rank"] = fmt_num(latest.get("rank"))
+    out["season_total_ranks"] = fmt_num(latest.get("total_ranks"))
+    out["season_points"] = fmt_num(latest.get("total_season_points"))
+
+    tsf = latest.get("total_season_flags")
+    if isinstance(tsf, dict):
+        out["season_flags"] = fmt_counter(tsf.get("obtained"), tsf.get("total"))
+
+    ftnr = latest.get("flags_to_next_rank")
+    if isinstance(ftnr, dict):
+        out["season_next_flags"] = fmt_counter(ftnr.get("obtained"), ftnr.get("total"))
+
+    return out
 
 
 def svg_card(base: dict[str, Any], extras: dict[str, Any]) -> str:
@@ -243,14 +238,18 @@ def svg_card(base: dict[str, Any], extras: dict[str, Any]) -> str:
     prolabs = extras.get("prolabs", "—/—")
     fortresses = extras.get("fortresses", "—/—")
 
+    # season fields
+    season_name = extras.get("season_name", "—")
+    season_league = extras.get("season_league", "—")
     season_rank = extras.get("season_rank", "—")
+    season_total_ranks = extras.get("season_total_ranks", "—")
     season_points = extras.get("season_points", "—")
     season_flags = extras.get("season_flags", "—/—")
+    season_next_flags = extras.get("season_next_flags", "—/—")
 
     completed_lines = wrap_names(extras.get("completed", []), max_chars=98)
 
-    # Dynamic height based on completed lines
-    base_h = 320
+    base_h = 340
     per_line = 18
     H = base_h + max(0, (len(completed_lines) - 1)) * per_line + 30
 
@@ -264,12 +263,11 @@ def svg_card(base: dict[str, Any], extras: dict[str, Any]) -> str:
         for y in range(0, H, 4)
     )
 
-    # Completed text lines
-    y0 = 285
-    completed_svg = []
-    for i, line in enumerate(completed_lines):
-        completed_svg.append(f'<text class="t s" x="{pad}" y="{y0 + i * per_line}">{esc(line)}</text>')
-    completed_svg_str = "\n  ".join(completed_svg)
+    y0 = 305
+    completed_svg = "\n  ".join(
+        f'<text class="t s" x="{pad}" y="{y0 + i * per_line}">{esc(line)}</text>'
+        for i, line in enumerate(completed_lines)
+    )
 
     return f'''<svg xmlns="http://www.w3.org/2000/svg" width="{W}" height="{H}" viewBox="0 0 {W} {H}">
   <defs>
@@ -324,10 +322,12 @@ def svg_card(base: dict[str, Any], extras: dict[str, Any]) -> str:
   <text class="t v" x="{pad+240}" y="220">{esc(fortresses)}</text>
 
   <text class="t k" x="{pad+480}" y="195">SEASON</text>
-  <text class="t v" x="{pad+480}" y="220">#{esc(season_rank)} · {esc(season_points)} pts · {esc(season_flags)} flags</text>
+  <text class="t s" x="{pad+480}" y="218">{esc(season_name)} · {esc(season_league)}</text>
+  <text class="t v" x="{pad+480}" y="240">#{esc(season_rank)}/{esc(season_total_ranks)} · {esc(season_points)} pts · {esc(season_flags)} flags</text>
+  <text class="t s muted" x="{pad+480}" y="262">next rank flags: {esc(season_next_flags)}</text>
 
-  <text class="t k" x="{pad}" y="265">COMPLETED PRO LABS</text>
-  {completed_svg_str}
+  <text class="t k" x="{pad}" y="285">COMPLETED PRO LABS</text>
+  {completed_svg}
 
   <text class="t k muted" x="{pad}" y="{H-28}">updated {updated}</text>
 </svg>
@@ -341,18 +341,11 @@ def main() -> None:
 
     pathlib.Path("assets").mkdir(parents=True, exist_ok=True)
 
-    debug: dict[str, Any] = {
-        "basic": {},
-        "prolabs": {},
-        "fortresses": {},
-        "challenges": {},
-        "season_probe": {},
-        "extras": {},
-    }
+    debug: dict[str, Any] = {"basic": {}, "prolabs": {}, "fortresses": {}, "challenges": {}, "season": {}, "extras": {}}
 
     # BASIC
-    ok, base_payload, err = try_json(BASIC_ENDPOINT, token)
-    debug["basic"] = {"used": BASIC_ENDPOINT, "ok": ok, "error": err}
+    ok, base_payload, meta = try_json(BASIC_ENDPOINT, token)
+    debug["basic"] = {"ok": ok, **meta}
     if not ok or not isinstance(base_payload, dict):
         OUT_DEBUG.write_text(json.dumps(debug, indent=2), encoding="utf-8")
         raise SystemExit("Failed to fetch basic profile payload.")
@@ -363,14 +356,19 @@ def main() -> None:
         "fortresses": "—/—",
         "completed": [],
         "challenges": "—/—",
+        # season
+        "season_name": "—",
+        "season_league": "—",
         "season_rank": "—",
+        "season_total_ranks": "—",
         "season_points": "—",
         "season_flags": "—/—",
+        "season_next_flags": "—/—",
     }
 
     # PROLABS
-    ok, payload, err = try_json(PROLAB_ENDPOINT, token)
-    debug["prolabs"] = {"used": PROLAB_ENDPOINT, "ok": ok, "error": err}
+    ok, payload, meta = try_json(PROLAB_ENDPOINT, token)
+    debug["prolabs"] = {"ok": ok, **meta}
     if ok:
         items = extract_list(payload)
         if items:
@@ -379,17 +377,17 @@ def main() -> None:
             extras["completed"] = merge_unique(extras["completed"], comp)
 
     # FORTRESSES
-    ok, payload, err = try_json(FORTRESS_ENDPOINT, token)
-    debug["fortresses"] = {"used": FORTRESS_ENDPOINT, "ok": ok, "error": err}
+    ok, payload, meta = try_json(FORTRESS_ENDPOINT, token)
+    debug["fortresses"] = {"ok": ok, **meta}
     if ok:
         items = extract_list(payload)
         if items:
             done, total, _ = extract_done_total_from_list(items)
             extras["fortresses"] = fmt_counter(done, total)
 
-    # CHALLENGES (active counter; you confirmed 23/188 and it looks right)
-    ok, payload, err = try_json(CHALLENGE_LIST_ENDPOINT, token)
-    debug["challenges"] = {"used": CHALLENGE_LIST_ENDPOINT, "ok": ok, "error": err}
+    # CHALLENGES (active list)
+    ok, payload, meta = try_json(CHALLENGE_LIST_ENDPOINT, token)
+    debug["challenges"] = {"ok": ok, **meta}
     if ok:
         items = extract_list(payload)
         if items:
@@ -407,14 +405,12 @@ def main() -> None:
             )
             extras["challenges"] = fmt_counter(solved, total)
 
-    # SEASON PROBE (still hunting)
-    used, season_payload, errs = probe_first_working(token, SEASON_CANDIDATES)
-    debug["season_probe"] = {"used": used, "errors": errs}
-    if used and season_payload is not None:
-        sr, sp, sf = find_season_fields(season_payload)
-        extras["season_rank"] = sr
-        extras["season_points"] = sp
-        extras["season_flags"] = sf
+    # SEASON (new endpoint)
+    ok, payload, meta = try_json(SEASON_RANKS_ENDPOINT, token)
+    debug["season"] = {"ok": ok, **meta}
+    if ok and payload is not None:
+        s = parse_latest_season(payload)
+        extras.update(s)
 
     debug["extras"] = extras
     OUT_DEBUG.write_text(json.dumps(debug, indent=2), encoding="utf-8")
