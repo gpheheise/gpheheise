@@ -1,87 +1,41 @@
 {
   "basic": {
     "used": "https://labs.hackthebox.com/api/v4/user/profile/basic/378794",
-    "errors": [],
-    "type": "dict"
+    "ok": true,
+    "error": ""
   },
   "prolabs": {
     "used": "https://labs.hackthebox.com/api/v4/prolabs",
-    "errors": [
-      "https://www.hackthebox.com/api/v4/prolabs -> HTTPError: HTTP Error 404: Not Found"
-    ],
-    "type": "dict"
-  },
-  "miniprolabs": {
-    "used": null,
-    "errors": [
-      "https://www.hackthebox.com/api/v4/minipro-labs -> HTTPError: HTTP Error 404: Not Found",
-      "https://www.hackthebox.com/api/v4/mini-prolabs -> HTTPError: HTTP Error 404: Not Found",
-      "https://www.hackthebox.com/api/v4/miniprolabs -> HTTPError: HTTP Error 404: Not Found",
-      "https://labs.hackthebox.com/api/v4/minipro-labs -> HTTPError: HTTP Error 404: Not Found",
-      "https://labs.hackthebox.com/api/v4/mini-prolabs -> HTTPError: HTTP Error 404: Not Found",
-      "https://labs.hackthebox.com/api/v4/miniprolabs -> HTTPError: HTTP Error 404: Not Found"
-    ],
-    "type": null
+    "ok": true,
+    "error": ""
   },
   "fortresses": {
     "used": "https://labs.hackthebox.com/api/v4/fortresses",
-    "errors": [
-      "https://www.hackthebox.com/api/v4/fortresses -> HTTPError: HTTP Error 404: Not Found"
-    ],
-    "type": "dict"
+    "ok": true,
+    "error": ""
   },
-  "season": {
-    "used": null,
-    "errors": [
-      "https://labs.hackthebox.com/api/v4/seasons/me -> HTTPError: HTTP Error 404: Not Found",
-      "https://labs.hackthebox.com/api/v4/season/me -> HTTPError: HTTP Error 404: Not Found",
-      "https://labs.hackthebox.com/api/v4/seasons/profile/378794 -> HTTPError: HTTP Error 404: Not Found",
-      "https://labs.hackthebox.com/api/v4/season/profile/378794 -> HTTPError: HTTP Error 404: Not Found"
+  "discovery": {
+    "page_url": "https://app.hackthebox.com/public/users/378794",
+    "script_src": [
+      "https://app.hackthebox.com/js/canny_sdk.js",
+      "https://fast.appcues.com/213301.js",
+      "https://kit.fontawesome.com/8161086d56.js",
+      "https://app.hackthebox.com/js/ShaderProgram.js",
+      "https://cdn.jsdelivr.net/npm/particles.js@2.0.0/particles.min.js",
+      "https://app.hackthebox.com/assets/index-DxTI1iCf.js"
     ],
-    "type": null
+    "scanned_scripts": [
+      "https://app.hackthebox.com/js/canny_sdk.js",
+      "https://fast.appcues.com/213301.js",
+      "https://app.hackthebox.com/js/ShaderProgram.js",
+      "https://cdn.jsdelivr.net/npm/particles.js@2.0.0/particles.min.js",
+      "https://app.hackthebox.com/assets/index-DxTI1iCf.js"
+    ],
+    "api_paths_found": []
   },
-  "base_keys": [
-    "id",
-    "sso_id",
-    "name",
-    "system_owns",
-    "user_owns",
-    "user_bloods",
-    "system_bloods",
-    "challenge_bloods",
-    "team",
-    "respects",
-    "rank",
-    "rank_id",
-    "current_rank_progress",
-    "next_rank",
-    "next_rank_points",
-    "rank_ownership",
-    "rank_requirement",
-    "ranking",
-    "avatar",
-    "timezone",
-    "isVip",
-    "isDedicatedVip",
-    "public",
-    "country_name",
-    "country_code",
-    "points",
-    "joined_date",
-    "university",
-    "university_name",
-    "github",
-    "linkedin",
-    "twitter",
-    "server",
-    "full_name",
-    "phone_number",
-    "cv",
-    "cpe_id",
-    "user_respects",
-    "user_follows",
-    "followed_by_count"
-  ],
+  "mini": {},
+  "challenges": {},
+  "season": {},
   "extras": {
     "prolabs": "11/30",
     "miniprolabs": "\u2014/\u2014",
@@ -105,9 +59,9 @@
       "Akerva",
       "Jet"
     ],
+    "challenges": "\u2014/\u2014",
     "season_rank": "\u2014",
     "season_points": "\u2014",
-    "challenges_done": "\u2014",
-    "challenges_total": "\u2014"
+    "season_flags": "\u2014/\u2014"
   }
 }
