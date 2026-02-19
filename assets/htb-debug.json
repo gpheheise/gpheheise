@@ -1,11 +1,46 @@
 {
-  "used_api": "https://labs.hackthebox.com/api/v4/user/profile/basic/378794",
-  "errors": [],
-  "payload_type": "dict",
-  "top_level_keys": [
-    "profile"
-  ],
-  "profile_keys": [
+  "basic": {
+    "used": "https://labs.hackthebox.com/api/v4/user/profile/basic/378794",
+    "errors": [],
+    "type": "dict"
+  },
+  "prolabs": {
+    "used": "https://labs.hackthebox.com/api/v4/prolabs",
+    "errors": [
+      "https://www.hackthebox.com/api/v4/prolabs -> HTTPError: HTTP Error 404: Not Found"
+    ],
+    "type": "dict"
+  },
+  "miniprolabs": {
+    "used": null,
+    "errors": [
+      "https://www.hackthebox.com/api/v4/minipro-labs -> HTTPError: HTTP Error 404: Not Found",
+      "https://www.hackthebox.com/api/v4/mini-prolabs -> HTTPError: HTTP Error 404: Not Found",
+      "https://www.hackthebox.com/api/v4/miniprolabs -> HTTPError: HTTP Error 404: Not Found",
+      "https://labs.hackthebox.com/api/v4/minipro-labs -> HTTPError: HTTP Error 404: Not Found",
+      "https://labs.hackthebox.com/api/v4/mini-prolabs -> HTTPError: HTTP Error 404: Not Found",
+      "https://labs.hackthebox.com/api/v4/miniprolabs -> HTTPError: HTTP Error 404: Not Found"
+    ],
+    "type": null
+  },
+  "fortresses": {
+    "used": "https://labs.hackthebox.com/api/v4/fortresses",
+    "errors": [
+      "https://www.hackthebox.com/api/v4/fortresses -> HTTPError: HTTP Error 404: Not Found"
+    ],
+    "type": "dict"
+  },
+  "season": {
+    "used": null,
+    "errors": [
+      "https://labs.hackthebox.com/api/v4/seasons/me -> HTTPError: HTTP Error 404: Not Found",
+      "https://labs.hackthebox.com/api/v4/season/me -> HTTPError: HTTP Error 404: Not Found",
+      "https://labs.hackthebox.com/api/v4/seasons/profile/378794 -> HTTPError: HTTP Error 404: Not Found",
+      "https://labs.hackthebox.com/api/v4/season/profile/378794 -> HTTPError: HTTP Error 404: Not Found"
+    ],
+    "type": null
+  },
+  "base_keys": [
     "id",
     "sso_id",
     "name",
@@ -46,5 +81,33 @@
     "user_respects",
     "user_follows",
     "followed_by_count"
-  ]
+  ],
+  "extras": {
+    "prolabs": "11/30",
+    "miniprolabs": "\u2014/\u2014",
+    "fortresses": "6/6",
+    "completed": [
+      "Dante",
+      "P.O.O",
+      "Alchemy",
+      "Zephyr",
+      "Xen",
+      "Offshore",
+      "RastaLabs",
+      "Intercept",
+      "Kaiju",
+      "Klendathu",
+      "Heron",
+      "AWS",
+      "Faraday",
+      "Synacktiv",
+      "Context",
+      "Akerva",
+      "Jet"
+    ],
+    "season_rank": "\u2014",
+    "season_points": "\u2014",
+    "challenges_done": "\u2014",
+    "challenges_total": "\u2014"
+  }
 }
