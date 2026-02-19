@@ -3,10 +3,9 @@ import json
 import os
 import pathlib
 import re
-import urllib.parse
 import urllib.request
 from datetime import datetime
-from typing import Any, Iterable, Optional, Tuple
+from typing import Any, Optional, Tuple
 
 
 HTB_USER_ID = "378794"
@@ -16,26 +15,8 @@ OUT_SVG = pathlib.Path("assets/htb-card.svg")
 OUT_DEBUG = pathlib.Path("assets/htb-debug.json")
 
 BASIC_ENDPOINT = f"https://labs.hackthebox.com/api/v4/user/profile/basic/{HTB_USER_ID}"
-
-# Working endpoints you already confirmed
 PROLAB_ENDPOINT = "https://labs.hackthebox.com/api/v4/prolabs"
 FORTRESS_ENDPOINT = "https://labs.hackthebox.com/api/v4/fortresses"
-
-# Where we scrape JS bundle URLs from
-PUBLIC_PAGE_URL = f"https://app.hackthebox.com/public/users/{HTB_USER_ID}"
-
-
-def fetch_text(url: str, headers: Optional[dict[str, str]] = None) -> str:
-    req = urllib.request.Request(
-        url,
-        headers=headers
-        or {
-            "User-Agent": "Mozilla/5.0 (GitHub Actions)",
-            "Accept": "text/html,*/*",
-        },
-    )
-    with urllib.request.urlopen(req, timeout=30) as r:
-        return r.read().decode("utf-8", errors="replace")
 
 
 def fetch_json(url: str, token: str) -> Any:
@@ -59,16 +40,6 @@ def try_json(url: str, token: str) -> tuple[bool, Any, str]:
         return False, None, f"{type(e).__name__}: {e}"
 
 
-def walk(obj: Any) -> Iterable[Any]:
-    if isinstance(obj, dict):
-        yield obj
-        for v in obj.values():
-            yield from walk(v)
-    elif isinstance(obj, list):
-        for v in obj:
-            yield from walk(v)
-
-
 def fmt_num(x: Any) -> str:
     if x is None or isinstance(x, bool):
         return "—"
@@ -90,28 +61,41 @@ def fmt_counter(done: Any, total: Any) -> str:
         return "—/—"
 
 
+def walk(obj: Any):
+    if isinstance(obj, dict):
+        yield obj
+        for v in obj.values():
+            yield from walk(v)
+    elif isinstance(obj, list):
+        for v in obj:
+            yield from walk(v)
+
+
 def extract_list(payload: Any) -> Optional[list[dict]]:
+    # direct list
     if isinstance(payload, list) and payload and all(isinstance(x, dict) for x in payload):
         return payload
+
+    # common wrappers
     if isinstance(payload, dict):
-        # common shapes
-        for k in ("data", "items", "result", "labs", "list"):
+        for k in ("data", "items", "result", "list", "labs", "entries"):
             v = payload.get(k)
             if isinstance(v, list) and v and all(isinstance(x, dict) for x in v):
                 return v
             if isinstance(v, dict):
-                for kk in ("labs", "items", "data", "list", "entries"):
+                for kk in ("data", "items", "list", "labs", "entries"):
                     vv = v.get(kk)
                     if isinstance(vv, list) and vv and all(isinstance(x, dict) for x in vv):
                         return vv
-        # fallback: deepest list of dicts that looks like content
-        for node in walk(payload):
-            if isinstance(node, dict):
-                for v in node.values():
-                    if isinstance(v, list) and v and all(isinstance(x, dict) for x in v):
-                        sample = v[0]
-                        if any(key in sample for key in ("name", "title")):
-                            return v
+
+    # deep fallback: first list of dicts containing a name/title
+    for node in walk(payload):
+        if isinstance(node, dict):
+            for v in node.values():
+                if isinstance(v, list) and v and all(isinstance(x, dict) for x in v):
+                    sample = v[0]
+                    if any(key in sample for key in ("name", "title")):
+                        return v
     return None
 
 
@@ -119,16 +103,37 @@ def extract_done_total_from_list(items: list[dict]) -> tuple[int, int, list[str]
     total = len(items)
     done = 0
     completed_names: list[str] = []
+
     for it in items:
         name = it.get("name") or it.get("title")
-        pct = it.get("ownership") or it.get("progress") or it.get("percentage") or it.get("completion")
-        try:
-            pct_f = float(pct) if pct is not None else None
-        except Exception:
-            pct_f = None
-        if name and pct_f is not None and pct_f >= 100.0:
+
+        # completion fields seen across HTB payloads
+        flags = [
+            it.get("ownership"),
+            it.get("progress"),
+            it.get("percentage"),
+            it.get("completion"),
+            it.get("completed"),
+            it.get("isCompleted"),
+            it.get("is_completed"),
+        ]
+
+        pct_val = None
+        for f in flags:
+            if isinstance(f, bool):
+                pct_val = 100.0 if f else 0.0
+                break
+            try:
+                if f is not None:
+                    pct_val = float(f)
+                    break
+            except Exception:
+                continue
+
+        if name and pct_val is not None and pct_val >= 100.0:
             done += 1
             completed_names.append(str(name))
+
     return done, total, completed_names
 
 
@@ -142,127 +147,27 @@ def merge_unique(a: list[str], b: list[str]) -> list[str]:
     return out
 
 
-def discover_api_paths_from_js() -> tuple[list[str], dict[str, Any]]:
-    """
-    Download app.hackthebox.com public profile HTML,
-    collect script src URLs, download a few chunks, scan for /api/v4/... strings.
-    Returns discovered absolute URLs + debug info.
-    """
-    debug: dict[str, Any] = {"page_url": PUBLIC_PAGE_URL, "script_src": [], "scanned_scripts": [], "api_paths_found": []}
-
-    page = fetch_text(PUBLIC_PAGE_URL)
-    # collect JS script URLs
-    srcs = re.findall(r'<script[^>]+src="([^"]+)"', page, flags=re.IGNORECASE)
-    # keep only next/static chunks and JS
-    srcs = [s for s in srcs if s.endswith(".js")]
-    # normalize
-    abs_srcs = []
-    for s in srcs:
-        abs_srcs.append(urllib.parse.urljoin("https://app.hackthebox.com", s))
-    debug["script_src"] = abs_srcs[:50]
-
-    api_paths = set()
-
-    # scan up to N scripts to keep runtime reasonable
-    for s in abs_srcs[:12]:
-        try:
-            js = fetch_text(s, headers={"User-Agent": "Mozilla/5.0", "Accept": "*/*"})
-            debug["scanned_scripts"].append(s)
-            # find occurrences like "/api/v4/...."
-            for m in re.finditer(r'"/api/v4/[^"]+"', js):
-                api_paths.add(m.group(0).strip('"'))
-        except Exception:
-            continue
-
-    debug["api_paths_found"] = sorted(api_paths)
-
-    # turn into absolute URLs (prefer labs.hackthebox.com and app.hackthebox.com)
-    # We'll try both when probing.
-    discovered = []
-    for p in sorted(api_paths):
-        discovered.append("https://labs.hackthebox.com" + p)
-        discovered.append("https://app.hackthebox.com" + p)
-    return discovered, debug
-
-
-def pick_best_mini_prolabs(token: str, candidates: list[str], debug: dict[str, Any]) -> tuple[str, Any]:
-    """
-    Find an endpoint that returns a list containing 'mini' or 'pro' lab-like content.
-    """
-    for url in candidates:
-        if not any(k in url.lower() for k in ("mini", "prolab", "pro-lab", "endgame", "lab")):
-            continue
-        ok, payload, err = try_json(url, token)
-        if not ok:
-            continue
-        items = extract_list(payload)
-        if items and len(items) >= 5:
-            # heuristic: item looks like lab with name/title
-            sample = items[0]
-            if isinstance(sample, dict) and (("name" in sample) or ("title" in sample)):
-                debug["mini_candidate_used"] = url
-                return url, payload
-    return "", None
-
-
-def pick_best_challenges(token: str, candidates: list[str], debug: dict[str, Any]) -> tuple[str, Any]:
-    """
-    Find an endpoint that looks like challenges stats/list.
-    """
-    for url in candidates:
-        if "challenge" not in url.lower():
-            continue
-        ok, payload, err = try_json(url, token)
-        if not ok:
-            continue
-        # if it contains total/solved-ish keys or a big list
-        solved = None
-        total = None
-        if isinstance(payload, dict):
-            solved = payload.get("solved") or payload.get("completed") or payload.get("solvedChallenges")
-            total = payload.get("total") or payload.get("totalChallenges")
-        items = extract_list(payload)
-        if (solved is not None and total is not None) or (items and len(items) > 100):
-            debug["challenges_candidate_used"] = url
-            return url, payload
-    return "", None
-
-
-def pick_best_season(token: str, candidates: list[str], debug: dict[str, Any]) -> tuple[str, Any]:
-    """
-    Find an endpoint that looks like seasonal ranking/stats.
-    """
-    for url in candidates:
-        if not any(k in url.lower() for k in ("season", "competitive", "leaderboard", "ranking")):
-            continue
-        ok, payload, err = try_json(url, token)
-        if not ok:
-            continue
-        # heuristics: contains rank/points/flags-ish keys
-        if isinstance(payload, dict):
-            if any(k in payload for k in ("seasonRank", "season_rank", "seasonalRanking", "ranking", "rank")):
-                debug["season_candidate_used"] = url
-                return url, payload
-        # nested
-        rk = None
-        pts = None
-        for node in walk(payload):
-            if isinstance(node, dict):
-                if rk is None:
-                    rk = node.get("seasonRank") or node.get("season_rank") or node.get("seasonalRanking")
-                if pts is None:
-                    pts = node.get("seasonPoints") or node.get("season_points") or node.get("points")
-        if rk is not None or pts is not None:
-            debug["season_candidate_used"] = url
-            return url, payload
+def pick_first_working(token: str, urls: list[str], debug_bucket: dict) -> tuple[str, Any]:
+    errs = []
+    for u in urls:
+        ok, payload, err = try_json(u, token)
+        if ok:
+            debug_bucket["used"] = u
+            debug_bucket["ok"] = True
+            debug_bucket["errors"] = errs
+            return u, payload
+        errs.append(f"{u} -> {err}")
+    debug_bucket["used"] = None
+    debug_bucket["ok"] = False
+    debug_bucket["errors"] = errs
     return "", None
 
 
 def svg_card(base: dict[str, Any], extras: dict[str, Any]) -> str:
-    W, H = 1080, 340
+    W, H = 1080, 360
     pad = 28
 
-    name = base.get("name") or base.get("username") or "Hack The Box"
+    name = base.get("name") or "Hack The Box"
     rank = base.get("rank") or "—"
     points = fmt_num(base.get("points"))
     global_rank = fmt_num(base.get("ranking"))
@@ -280,7 +185,7 @@ def svg_card(base: dict[str, Any], extras: dict[str, Any]) -> str:
     season_flags = extras.get("season_flags", "—/—")
 
     completed = extras.get("completed", [])
-    completed_line = " · ".join(completed[:10]) if completed else "—"
+    completed_line = " · ".join(completed[:12]) if completed else "—"
 
     updated = datetime.utcnow().strftime("%Y-%m-%d %H:%M UTC")
 
@@ -320,7 +225,6 @@ def svg_card(base: dict[str, Any], extras: dict[str, Any]) -> str:
   <text class="t h" x="{pad}" y="55" filter="url(#glow)">{esc(name)}</text>
   <text class="t s muted" x="{pad}" y="78">{esc(rank)} · {esc(PROFILE_URL)}</text>
 
-  <!-- Global stats -->
   <text class="t k" x="{pad}" y="120">POINTS</text>
   <text class="t v" x="{pad}" y="145">{esc(points)}</text>
 
@@ -339,7 +243,6 @@ def svg_card(base: dict[str, Any], extras: dict[str, Any]) -> str:
   <text class="t k" x="{pad+900}" y="120">CHALLENGES</text>
   <text class="t v" x="{pad+900}" y="145">{esc(challenges)}</text>
 
-  <!-- Labs / Season -->
   <text class="t k" x="{pad}" y="195">PRO LABS</text>
   <text class="t v" x="{pad}" y="220">{esc(prolabs)}</text>
 
@@ -371,17 +274,15 @@ def main() -> None:
         "basic": {},
         "prolabs": {},
         "fortresses": {},
-        "discovery": {},
-        "mini": {},
-        "challenges": {},
-        "season": {},
+        "miniprolabs_probe": {},
+        "challenges_probe": {},
+        "season_probe": {},
+        "extras": {},
     }
 
-    # 1) Basic profile
+    # BASIC
     ok, base_payload, err = try_json(BASIC_ENDPOINT, token)
-    debug["basic"]["used"] = BASIC_ENDPOINT
-    debug["basic"]["ok"] = ok
-    debug["basic"]["error"] = err
+    debug["basic"] = {"used": BASIC_ENDPOINT, "ok": ok, "error": err}
     if not ok or not isinstance(base_payload, dict):
         OUT_DEBUG.write_text(json.dumps(debug, indent=2), encoding="utf-8")
         raise SystemExit("Failed to fetch basic profile payload.")
@@ -399,77 +300,116 @@ def main() -> None:
         "season_flags": "—/—",
     }
 
-    # 2) Prolabs
-    ok, p, err = try_json(PROLAB_ENDPOINT, token)
-    debug["prolabs"]["used"] = PROLAB_ENDPOINT
-    debug["prolabs"]["ok"] = ok
-    debug["prolabs"]["error"] = err
+    # PROLABS
+    ok, payload, err = try_json(PROLAB_ENDPOINT, token)
+    debug["prolabs"] = {"used": PROLAB_ENDPOINT, "ok": ok, "error": err}
     if ok:
-        items = extract_list(p)
+        items = extract_list(payload)
         if items:
             done, total, comp = extract_done_total_from_list(items)
             extras["prolabs"] = fmt_counter(done, total)
             extras["completed"] = merge_unique(extras["completed"], comp)
 
-    # 3) Fortresses
-    ok, p, err = try_json(FORTRESS_ENDPOINT, token)
-    debug["fortresses"]["used"] = FORTRESS_ENDPOINT
-    debug["fortresses"]["ok"] = ok
-    debug["fortresses"]["error"] = err
+    # FORTRESSES
+    ok, payload, err = try_json(FORTRESS_ENDPOINT, token)
+    debug["fortresses"] = {"used": FORTRESS_ENDPOINT, "ok": ok, "error": err}
     if ok:
-        items = extract_list(p)
+        items = extract_list(payload)
         if items:
             done, total, comp = extract_done_total_from_list(items)
             extras["fortresses"] = fmt_counter(done, total)
             extras["completed"] = merge_unique(extras["completed"], comp)
 
-    # 4) Discover endpoints from JS bundles
-    discovered_urls, disc_dbg = discover_api_paths_from_js()
-    debug["discovery"] = disc_dbg
-    # keep candidates small
-    discovered_urls = discovered_urls[:250]
-
-    # 5) Mini Prolabs (discover)
-    used, payload = pick_best_mini_prolabs(token, discovered_urls, debug["mini"])
-    if used and payload is not None:
-        items = extract_list(payload)
+    # MINI PROLABS / ENDGAMES PROBE (we’ll try a smart shortlist)
+    miniprolab_candidates = [
+        "https://labs.hackthebox.com/api/v4/minipro-labs",
+        "https://labs.hackthebox.com/api/v4/mini-pro-labs",
+        "https://labs.hackthebox.com/api/v4/mini-prolabs",
+        "https://labs.hackthebox.com/api/v4/miniprolabs",
+        "https://labs.hackthebox.com/api/v4/prolabs/mini",
+        "https://labs.hackthebox.com/api/v4/prolabs/mini-pro-labs",
+        # legacy-ish naming (often still exists behind the scenes)
+        "https://labs.hackthebox.com/api/v4/endgames",
+        "https://labs.hackthebox.com/api/v4/endgame",
+        "https://labs.hackthebox.com/api/v4/endgames/list",
+    ]
+    used, mini_payload = pick_first_working(token, miniprolab_candidates, debug["miniprolabs_probe"])
+    if used and mini_payload is not None:
+        items = extract_list(mini_payload)
         if items:
             done, total, comp = extract_done_total_from_list(items)
             extras["miniprolabs"] = fmt_counter(done, total)
             extras["completed"] = merge_unique(extras["completed"], comp)
 
-    # 6) Challenges (discover)
-    used, payload = pick_best_challenges(token, discovered_urls, debug["challenges"])
-    if used and payload is not None:
-        # Try to get solved/total directly
+    # CHALLENGES PROBE (solved/total)
+    challenges_candidates = [
+        "https://labs.hackthebox.com/api/v4/challenge/list",
+        "https://labs.hackthebox.com/api/v4/challenges/list",
+        "https://labs.hackthebox.com/api/v4/challenge/list?limit=10000",
+        "https://labs.hackthebox.com/api/v4/challenges/list?limit=10000",
+        f"https://labs.hackthebox.com/api/v4/user/profile/challenges/{HTB_USER_ID}",
+        f"https://labs.hackthebox.com/api/v4/user/challenges/{HTB_USER_ID}",
+        f"https://labs.hackthebox.com/api/v4/user/profile/progress/{HTB_USER_ID}",
+    ]
+    used, chall_payload = pick_first_working(token, challenges_candidates, debug["challenges_probe"])
+    if used and chall_payload is not None:
         solved = None
         total = None
-        if isinstance(payload, dict):
-            solved = payload.get("solved") or payload.get("completed") or find_first(payload, {"solved", "completed", "solvedChallenges", "challengesSolved"})
-            total = payload.get("total") or payload.get("totalChallenges") or find_first(payload, {"total", "totalChallenges", "challengesTotal"})
-        if solved is None or total is None:
-            # fallback: if it's a list of challenges, total is len(list), solved count by "solved" flag
-            items = extract_list(payload)
-            if items:
-                total = len(items)
-                solved = sum(1 for it in items if isinstance(it, dict) and (it.get("solved") is True or it.get("isSolved") is True))
+
+        # direct counters (if they exist)
+        if isinstance(chall_payload, dict):
+            for node in walk(chall_payload):
+                if not isinstance(node, dict):
+                    continue
+                solved = solved or node.get("solved") or node.get("completed") or node.get("solvedChallenges") or node.get("challenge_owns")
+                total = total or node.get("total") or node.get("totalChallenges") or node.get("challengesTotal")
+
+        # list fallback
+        items = extract_list(chall_payload)
+        if items:
+            total = total or len(items)
+            solved = solved or sum(
+                1
+                for it in items
+                if isinstance(it, dict)
+                and (
+                    it.get("solved") is True
+                    or it.get("isSolved") is True
+                    or it.get("completed") is True
+                    or it.get("isCompleted") is True
+                )
+            )
+
         extras["challenges"] = fmt_counter(solved, total)
 
-    # 7) Season (discover)
-    used, payload = pick_best_season(token, discovered_urls, debug["season"])
-    if used and payload is not None:
-        # try a few key names
+    # SEASON PROBE
+    season_candidates = [
+        "https://labs.hackthebox.com/api/v4/seasons",
+        "https://labs.hackthebox.com/api/v4/season",
+        "https://labs.hackthebox.com/api/v4/seasons/me",
+        "https://labs.hackthebox.com/api/v4/season/me",
+        f"https://labs.hackthebox.com/api/v4/seasons/profile/{HTB_USER_ID}",
+        f"https://labs.hackthebox.com/api/v4/season/profile/{HTB_USER_ID}",
+        "https://labs.hackthebox.com/api/v4/competitive/seasons",
+        "https://labs.hackthebox.com/api/v4/competitive/season",
+        "https://labs.hackthebox.com/api/v4/seasonal",
+        "https://labs.hackthebox.com/api/v4/seasonal/me",
+    ]
+    used, season_payload = pick_first_working(token, season_candidates, debug["season_probe"])
+    if used and season_payload is not None:
         rk = None
         pts = None
         flags_solved = None
         flags_total = None
-        for node in walk(payload):
+
+        for node in walk(season_payload):
             if not isinstance(node, dict):
                 continue
-            rk = rk or node.get("seasonRank") or node.get("season_rank") or node.get("seasonalRanking") or node.get("ranking")
+            rk = rk or node.get("seasonRank") or node.get("season_rank") or node.get("ranking") or node.get("rank")
             pts = pts or node.get("seasonPoints") or node.get("season_points") or node.get("points") or node.get("score")
             flags_solved = flags_solved or node.get("flags") or node.get("flagsOwned") or node.get("solvedFlags")
             flags_total = flags_total or node.get("flagsTotal") or node.get("totalFlags") or node.get("maxFlags")
+
         extras["season_rank"] = fmt_num(rk)
         extras["season_points"] = fmt_num(pts)
         if flags_solved is not None and flags_total is not None:
