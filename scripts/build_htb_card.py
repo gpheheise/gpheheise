@@ -3,6 +3,7 @@ import json
 import os
 import pathlib
 import re
+import urllib.parse
 import urllib.request
 from datetime import datetime
 from typing import Any, Iterable, Optional, Tuple
@@ -14,38 +15,27 @@ PROFILE_URL = f"https://app.hackthebox.com/public/users/{HTB_USER_ID}"
 OUT_SVG = pathlib.Path("assets/htb-card.svg")
 OUT_DEBUG = pathlib.Path("assets/htb-debug.json")
 
+BASIC_ENDPOINT = f"https://labs.hackthebox.com/api/v4/user/profile/basic/{HTB_USER_ID}"
 
-# ✅ Known-good endpoint (you already have numbers from this)
-BASIC_ENDPOINTS = [
-    f"https://labs.hackthebox.com/api/v4/user/profile/basic/{HTB_USER_ID}",
-]
+# Working endpoints you already confirmed
+PROLAB_ENDPOINT = "https://labs.hackthebox.com/api/v4/prolabs"
+FORTRESS_ENDPOINT = "https://labs.hackthebox.com/api/v4/fortresses"
 
-# 🔎 Extra endpoints (best-effort, token-auth). We probe and parse what we can.
-PROLAB_ENDPOINTS = [
-    "https://www.hackthebox.com/api/v4/prolabs",
-    "https://labs.hackthebox.com/api/v4/prolabs",
-]
+# Where we scrape JS bundle URLs from
+PUBLIC_PAGE_URL = f"https://app.hackthebox.com/public/users/{HTB_USER_ID}"
 
-MINIPROLAB_ENDPOINTS = [
-    "https://www.hackthebox.com/api/v4/minipro-labs",
-    "https://www.hackthebox.com/api/v4/mini-prolabs",
-    "https://www.hackthebox.com/api/v4/miniprolabs",
-    "https://labs.hackthebox.com/api/v4/minipro-labs",
-    "https://labs.hackthebox.com/api/v4/mini-prolabs",
-    "https://labs.hackthebox.com/api/v4/miniprolabs",
-]
 
-FORTRESS_ENDPOINTS = [
-    "https://www.hackthebox.com/api/v4/fortresses",
-    "https://labs.hackthebox.com/api/v4/fortresses",
-]
-
-SEASON_ENDPOINTS = [
-    "https://labs.hackthebox.com/api/v4/seasons/me",
-    "https://labs.hackthebox.com/api/v4/season/me",
-    f"https://labs.hackthebox.com/api/v4/seasons/profile/{HTB_USER_ID}",
-    f"https://labs.hackthebox.com/api/v4/season/profile/{HTB_USER_ID}",
-]
+def fetch_text(url: str, headers: Optional[dict[str, str]] = None) -> str:
+    req = urllib.request.Request(
+        url,
+        headers=headers
+        or {
+            "User-Agent": "Mozilla/5.0 (GitHub Actions)",
+            "Accept": "text/html,*/*",
+        },
+    )
+    with urllib.request.urlopen(req, timeout=30) as r:
+        return r.read().decode("utf-8", errors="replace")
 
 
 def fetch_json(url: str, token: str) -> Any:
@@ -62,14 +52,11 @@ def fetch_json(url: str, token: str) -> Any:
         return json.loads(raw)
 
 
-def try_first_json(urls: list[str], token: str) -> tuple[Optional[str], Any, list[str]]:
-    errors: list[str] = []
-    for u in urls:
-        try:
-            return u, fetch_json(u, token), errors
-        except Exception as e:
-            errors.append(f"{u} -> {type(e).__name__}: {e}")
-    return None, None, errors
+def try_json(url: str, token: str) -> tuple[bool, Any, str]:
+    try:
+        return True, fetch_json(url, token), ""
+    except Exception as e:
+        return False, None, f"{type(e).__name__}: {e}"
 
 
 def walk(obj: Any) -> Iterable[Any]:
@@ -82,19 +69,8 @@ def walk(obj: Any) -> Iterable[Any]:
             yield from walk(v)
 
 
-def find_first(obj: Any, keys: set[str]) -> Any:
-    for node in walk(obj):
-        if isinstance(node, dict):
-            for k in keys:
-                if k in node and node[k] is not None:
-                    return node[k]
-    return None
-
-
 def fmt_num(x: Any) -> str:
-    if x is None:
-        return "—"
-    if isinstance(x, bool):
+    if x is None or isinstance(x, bool):
         return "—"
     if isinstance(x, (int, float)):
         if isinstance(x, float) and x.is_integer():
@@ -114,6 +90,31 @@ def fmt_counter(done: Any, total: Any) -> str:
         return "—/—"
 
 
+def extract_list(payload: Any) -> Optional[list[dict]]:
+    if isinstance(payload, list) and payload and all(isinstance(x, dict) for x in payload):
+        return payload
+    if isinstance(payload, dict):
+        # common shapes
+        for k in ("data", "items", "result", "labs", "list"):
+            v = payload.get(k)
+            if isinstance(v, list) and v and all(isinstance(x, dict) for x in v):
+                return v
+            if isinstance(v, dict):
+                for kk in ("labs", "items", "data", "list", "entries"):
+                    vv = v.get(kk)
+                    if isinstance(vv, list) and vv and all(isinstance(x, dict) for x in vv):
+                        return vv
+        # fallback: deepest list of dicts that looks like content
+        for node in walk(payload):
+            if isinstance(node, dict):
+                for v in node.values():
+                    if isinstance(v, list) and v and all(isinstance(x, dict) for x in v):
+                        sample = v[0]
+                        if any(key in sample for key in ("name", "title")):
+                            return v
+    return None
+
+
 def extract_done_total_from_list(items: list[dict]) -> tuple[int, int, list[str]]:
     total = len(items)
     done = 0
@@ -131,42 +132,6 @@ def extract_done_total_from_list(items: list[dict]) -> tuple[int, int, list[str]
     return done, total, completed_names
 
 
-def extract_list(payload: Any) -> Optional[list[dict]]:
-    """
-    Find the most plausible list-of-dicts payload that contains lab-like objects.
-    Common shapes:
-      - {"data": [...]}
-      - {"data": {"labs": [...]}}
-      - {"items": [...]}
-      - {"<something>": [...]}
-    """
-    if isinstance(payload, list) and payload and all(isinstance(x, dict) for x in payload):
-        return payload
-
-    if isinstance(payload, dict):
-        for k in ("data", "items", "result", "labs", "list"):
-            v = payload.get(k)
-            if isinstance(v, list) and v and all(isinstance(x, dict) for x in v):
-                return v
-            if isinstance(v, dict):
-                # nested list
-                for kk in ("labs", "items", "data", "list", "entries"):
-                    vv = v.get(kk)
-                    if isinstance(vv, list) and vv and all(isinstance(x, dict) for x in vv):
-                        return vv
-
-        # last resort: search nested
-        for node in walk(payload):
-            if isinstance(node, dict):
-                for v in node.values():
-                    if isinstance(v, list) and v and all(isinstance(x, dict) for x in v):
-                        # Heuristic: must contain name/title fields
-                        sample = v[0]
-                        if any(key in sample for key in ("name", "title")):
-                            return v
-    return None
-
-
 def merge_unique(a: list[str], b: list[str]) -> list[str]:
     seen = set()
     out = []
@@ -175,6 +140,122 @@ def merge_unique(a: list[str], b: list[str]) -> list[str]:
             seen.add(x)
             out.append(x)
     return out
+
+
+def discover_api_paths_from_js() -> tuple[list[str], dict[str, Any]]:
+    """
+    Download app.hackthebox.com public profile HTML,
+    collect script src URLs, download a few chunks, scan for /api/v4/... strings.
+    Returns discovered absolute URLs + debug info.
+    """
+    debug: dict[str, Any] = {"page_url": PUBLIC_PAGE_URL, "script_src": [], "scanned_scripts": [], "api_paths_found": []}
+
+    page = fetch_text(PUBLIC_PAGE_URL)
+    # collect JS script URLs
+    srcs = re.findall(r'<script[^>]+src="([^"]+)"', page, flags=re.IGNORECASE)
+    # keep only next/static chunks and JS
+    srcs = [s for s in srcs if s.endswith(".js")]
+    # normalize
+    abs_srcs = []
+    for s in srcs:
+        abs_srcs.append(urllib.parse.urljoin("https://app.hackthebox.com", s))
+    debug["script_src"] = abs_srcs[:50]
+
+    api_paths = set()
+
+    # scan up to N scripts to keep runtime reasonable
+    for s in abs_srcs[:12]:
+        try:
+            js = fetch_text(s, headers={"User-Agent": "Mozilla/5.0", "Accept": "*/*"})
+            debug["scanned_scripts"].append(s)
+            # find occurrences like "/api/v4/...."
+            for m in re.finditer(r'"/api/v4/[^"]+"', js):
+                api_paths.add(m.group(0).strip('"'))
+        except Exception:
+            continue
+
+    debug["api_paths_found"] = sorted(api_paths)
+
+    # turn into absolute URLs (prefer labs.hackthebox.com and app.hackthebox.com)
+    # We'll try both when probing.
+    discovered = []
+    for p in sorted(api_paths):
+        discovered.append("https://labs.hackthebox.com" + p)
+        discovered.append("https://app.hackthebox.com" + p)
+    return discovered, debug
+
+
+def pick_best_mini_prolabs(token: str, candidates: list[str], debug: dict[str, Any]) -> tuple[str, Any]:
+    """
+    Find an endpoint that returns a list containing 'mini' or 'pro' lab-like content.
+    """
+    for url in candidates:
+        if not any(k in url.lower() for k in ("mini", "prolab", "pro-lab", "endgame", "lab")):
+            continue
+        ok, payload, err = try_json(url, token)
+        if not ok:
+            continue
+        items = extract_list(payload)
+        if items and len(items) >= 5:
+            # heuristic: item looks like lab with name/title
+            sample = items[0]
+            if isinstance(sample, dict) and (("name" in sample) or ("title" in sample)):
+                debug["mini_candidate_used"] = url
+                return url, payload
+    return "", None
+
+
+def pick_best_challenges(token: str, candidates: list[str], debug: dict[str, Any]) -> tuple[str, Any]:
+    """
+    Find an endpoint that looks like challenges stats/list.
+    """
+    for url in candidates:
+        if "challenge" not in url.lower():
+            continue
+        ok, payload, err = try_json(url, token)
+        if not ok:
+            continue
+        # if it contains total/solved-ish keys or a big list
+        solved = None
+        total = None
+        if isinstance(payload, dict):
+            solved = payload.get("solved") or payload.get("completed") or payload.get("solvedChallenges")
+            total = payload.get("total") or payload.get("totalChallenges")
+        items = extract_list(payload)
+        if (solved is not None and total is not None) or (items and len(items) > 100):
+            debug["challenges_candidate_used"] = url
+            return url, payload
+    return "", None
+
+
+def pick_best_season(token: str, candidates: list[str], debug: dict[str, Any]) -> tuple[str, Any]:
+    """
+    Find an endpoint that looks like seasonal ranking/stats.
+    """
+    for url in candidates:
+        if not any(k in url.lower() for k in ("season", "competitive", "leaderboard", "ranking")):
+            continue
+        ok, payload, err = try_json(url, token)
+        if not ok:
+            continue
+        # heuristics: contains rank/points/flags-ish keys
+        if isinstance(payload, dict):
+            if any(k in payload for k in ("seasonRank", "season_rank", "seasonalRanking", "ranking", "rank")):
+                debug["season_candidate_used"] = url
+                return url, payload
+        # nested
+        rk = None
+        pts = None
+        for node in walk(payload):
+            if isinstance(node, dict):
+                if rk is None:
+                    rk = node.get("seasonRank") or node.get("season_rank") or node.get("seasonalRanking")
+                if pts is None:
+                    pts = node.get("seasonPoints") or node.get("season_points") or node.get("points")
+        if rk is not None or pts is not None:
+            debug["season_candidate_used"] = url
+            return url, payload
+    return "", None
 
 
 def svg_card(base: dict[str, Any], extras: dict[str, Any]) -> str:
@@ -189,17 +270,14 @@ def svg_card(base: dict[str, Any], extras: dict[str, Any]) -> str:
     system_owns = fmt_num(base.get("system_owns"))
     respects = fmt_num(base.get("respects"))
 
-    # Challenges shown on the profile page (e.g., 69/814)
-    challenges_done = extras.get("challenges_done", "—")
-    challenges_total = extras.get("challenges_total", "—")
-    challenges = f"{challenges_done}/{challenges_total}" if challenges_done != "—" else "—/—"
-
+    challenges = extras.get("challenges", "—/—")
     prolabs = extras.get("prolabs", "—/—")
     miniprolabs = extras.get("miniprolabs", "—/—")
     fortresses = extras.get("fortresses", "—/—")
 
     season_rank = extras.get("season_rank", "—")
     season_points = extras.get("season_points", "—")
+    season_flags = extras.get("season_flags", "—/—")
 
     completed = extras.get("completed", [])
     completed_line = " · ".join(completed[:10]) if completed else "—"
@@ -271,13 +349,10 @@ def svg_card(base: dict[str, Any], extras: dict[str, Any]) -> str:
   <text class="t k" x="{pad+400}" y="195">FORTRESSES</text>
   <text class="t v" x="{pad+400}" y="220">{esc(fortresses)}</text>
 
-  <text class="t k" x="{pad+610}" y="195">SEASON RANK</text>
-  <text class="t v" x="{pad+610}" y="220">#{esc(season_rank)}</text>
+  <text class="t k" x="{pad+610}" y="195">SEASON</text>
+  <text class="t v" x="{pad+610}" y="220">#{esc(season_rank)} · {esc(season_points)} pts · {esc(season_flags)} flags</text>
 
-  <text class="t k" x="{pad+820}" y="195">SEASON POINTS</text>
-  <text class="t v" x="{pad+820}" y="220">{esc(season_points)}</text>
-
-  <text class="t k" x="{pad}" y="265">COMPLETED (LABS)</text>
+  <text class="t k" x="{pad}" y="265">COMPLETED</text>
   <text class="t s" x="{pad}" y="288">{esc(completed_line)}</text>
 
   <text class="t k muted" x="{pad}" y="{H-28}">updated {updated}</text>
@@ -292,92 +367,117 @@ def main() -> None:
 
     pathlib.Path("assets").mkdir(parents=True, exist_ok=True)
 
-    debug: dict[str, Any] = {"basic": {}, "prolabs": {}, "miniprolabs": {}, "fortresses": {}, "season": {}}
+    debug: dict[str, Any] = {
+        "basic": {},
+        "prolabs": {},
+        "fortresses": {},
+        "discovery": {},
+        "mini": {},
+        "challenges": {},
+        "season": {},
+    }
 
     # 1) Basic profile
-    used_basic, basic_payload, basic_errors = try_first_json(BASIC_ENDPOINTS, token)
-    debug["basic"]["used"] = used_basic
-    debug["basic"]["errors"] = basic_errors
-    debug["basic"]["type"] = type(basic_payload).__name__ if basic_payload is not None else None
-
-    if not isinstance(basic_payload, dict):
+    ok, base_payload, err = try_json(BASIC_ENDPOINT, token)
+    debug["basic"]["used"] = BASIC_ENDPOINT
+    debug["basic"]["ok"] = ok
+    debug["basic"]["error"] = err
+    if not ok or not isinstance(base_payload, dict):
         OUT_DEBUG.write_text(json.dumps(debug, indent=2), encoding="utf-8")
         raise SystemExit("Failed to fetch basic profile payload.")
 
-    base = basic_payload.get("profile") if isinstance(basic_payload.get("profile"), dict) else basic_payload
+    base = base_payload.get("profile") if isinstance(base_payload.get("profile"), dict) else base_payload
 
     extras: dict[str, Any] = {
         "prolabs": "—/—",
         "miniprolabs": "—/—",
         "fortresses": "—/—",
         "completed": [],
+        "challenges": "—/—",
         "season_rank": "—",
         "season_points": "—",
-        "challenges_done": "—",
-        "challenges_total": "—",
+        "season_flags": "—/—",
     }
 
-    # Challenges x/y often exist in the basic payload under different names
-    # We try common keys and nested keys.
-    ch_done = base.get("challenges") or find_first(basic_payload, {"challenges", "challengesSolved", "solvedChallenges"})
-    ch_total = base.get("challenges_total") or find_first(basic_payload, {"challenges_total", "totalChallenges", "challengesTotal"})
-    # Sometimes total is displayed as 814 but not present; this stays "—" if not found.
-    extras["challenges_done"] = fmt_num(ch_done)
-    extras["challenges_total"] = fmt_num(ch_total)
+    # 2) Prolabs
+    ok, p, err = try_json(PROLAB_ENDPOINT, token)
+    debug["prolabs"]["used"] = PROLAB_ENDPOINT
+    debug["prolabs"]["ok"] = ok
+    debug["prolabs"]["error"] = err
+    if ok:
+        items = extract_list(p)
+        if items:
+            done, total, comp = extract_done_total_from_list(items)
+            extras["prolabs"] = fmt_counter(done, total)
+            extras["completed"] = merge_unique(extras["completed"], comp)
 
-    # 2) ProLabs
-    used, payload, errs = try_first_json(PROLAB_ENDPOINTS, token)
-    debug["prolabs"]["used"] = used
-    debug["prolabs"]["errors"] = errs
-    debug["prolabs"]["type"] = type(payload).__name__ if payload is not None else None
+    # 3) Fortresses
+    ok, p, err = try_json(FORTRESS_ENDPOINT, token)
+    debug["fortresses"]["used"] = FORTRESS_ENDPOINT
+    debug["fortresses"]["ok"] = ok
+    debug["fortresses"]["error"] = err
+    if ok:
+        items = extract_list(p)
+        if items:
+            done, total, comp = extract_done_total_from_list(items)
+            extras["fortresses"] = fmt_counter(done, total)
+            extras["completed"] = merge_unique(extras["completed"], comp)
 
-    pro_list = extract_list(payload)
-    if pro_list:
-        done, total, comp = extract_done_total_from_list(pro_list)
-        extras["prolabs"] = fmt_counter(done, total)
-        extras["completed"] = merge_unique(extras["completed"], comp)
+    # 4) Discover endpoints from JS bundles
+    discovered_urls, disc_dbg = discover_api_paths_from_js()
+    debug["discovery"] = disc_dbg
+    # keep candidates small
+    discovered_urls = discovered_urls[:250]
 
-    # 3) Mini ProLabs
-    used, payload, errs = try_first_json(MINIPROLAB_ENDPOINTS, token)
-    debug["miniprolabs"]["used"] = used
-    debug["miniprolabs"]["errors"] = errs
-    debug["miniprolabs"]["type"] = type(payload).__name__ if payload is not None else None
+    # 5) Mini Prolabs (discover)
+    used, payload = pick_best_mini_prolabs(token, discovered_urls, debug["mini"])
+    if used and payload is not None:
+        items = extract_list(payload)
+        if items:
+            done, total, comp = extract_done_total_from_list(items)
+            extras["miniprolabs"] = fmt_counter(done, total)
+            extras["completed"] = merge_unique(extras["completed"], comp)
 
-    mini_list = extract_list(payload)
-    if mini_list:
-        done, total, comp = extract_done_total_from_list(mini_list)
-        extras["miniprolabs"] = fmt_counter(done, total)
-        extras["completed"] = merge_unique(extras["completed"], comp)
+    # 6) Challenges (discover)
+    used, payload = pick_best_challenges(token, discovered_urls, debug["challenges"])
+    if used and payload is not None:
+        # Try to get solved/total directly
+        solved = None
+        total = None
+        if isinstance(payload, dict):
+            solved = payload.get("solved") or payload.get("completed") or find_first(payload, {"solved", "completed", "solvedChallenges", "challengesSolved"})
+            total = payload.get("total") or payload.get("totalChallenges") or find_first(payload, {"total", "totalChallenges", "challengesTotal"})
+        if solved is None or total is None:
+            # fallback: if it's a list of challenges, total is len(list), solved count by "solved" flag
+            items = extract_list(payload)
+            if items:
+                total = len(items)
+                solved = sum(1 for it in items if isinstance(it, dict) and (it.get("solved") is True or it.get("isSolved") is True))
+        extras["challenges"] = fmt_counter(solved, total)
 
-    # 4) Fortresses
-    used, payload, errs = try_first_json(FORTRESS_ENDPOINTS, token)
-    debug["fortresses"]["used"] = used
-    debug["fortresses"]["errors"] = errs
-    debug["fortresses"]["type"] = type(payload).__name__ if payload is not None else None
+    # 7) Season (discover)
+    used, payload = pick_best_season(token, discovered_urls, debug["season"])
+    if used and payload is not None:
+        # try a few key names
+        rk = None
+        pts = None
+        flags_solved = None
+        flags_total = None
+        for node in walk(payload):
+            if not isinstance(node, dict):
+                continue
+            rk = rk or node.get("seasonRank") or node.get("season_rank") or node.get("seasonalRanking") or node.get("ranking")
+            pts = pts or node.get("seasonPoints") or node.get("season_points") or node.get("points") or node.get("score")
+            flags_solved = flags_solved or node.get("flags") or node.get("flagsOwned") or node.get("solvedFlags")
+            flags_total = flags_total or node.get("flagsTotal") or node.get("totalFlags") or node.get("maxFlags")
+        extras["season_rank"] = fmt_num(rk)
+        extras["season_points"] = fmt_num(pts)
+        if flags_solved is not None and flags_total is not None:
+            extras["season_flags"] = fmt_counter(flags_solved, flags_total)
 
-    fort_list = extract_list(payload)
-    if fort_list:
-        done, total, comp = extract_done_total_from_list(fort_list)
-        extras["fortresses"] = fmt_counter(done, total)
-        extras["completed"] = merge_unique(extras["completed"], comp)
-
-    # 5) Season (best-effort)
-    used, payload, errs = try_first_json(SEASON_ENDPOINTS, token)
-    debug["season"]["used"] = used
-    debug["season"]["errors"] = errs
-    debug["season"]["type"] = type(payload).__name__ if payload is not None else None
-
-    if payload is not None:
-        # extract common patterns
-        extras["season_rank"] = fmt_num(find_first(payload, {"seasonRank", "season_rank", "ranking", "rank"}))
-        extras["season_points"] = fmt_num(find_first(payload, {"seasonPoints", "season_points", "points", "score"}))
-
-    # Write debug (safe, does NOT include token)
-    debug["base_keys"] = list(base.keys()) if isinstance(base, dict) else None
     debug["extras"] = extras
     OUT_DEBUG.write_text(json.dumps(debug, indent=2), encoding="utf-8")
 
-    # Render SVG
     OUT_SVG.write_text(svg_card(base, extras), encoding="utf-8")
     print(f"Wrote {OUT_SVG}")
     print(f"Wrote {OUT_DEBUG}")
