@@ -1,4 +1,4 @@
-![Matrix Banner](assets/matrix-banner.gif)
+![Matrix Banner](assets/matrix-banner1.gif)
 
 # 👋 Hi, I’m Georg
 
