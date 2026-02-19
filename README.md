@@ -7,21 +7,31 @@ I focus on practical exploitation, responsible disclosure, and building security
 
 
 <!-- MEET ME NEXT -->
+
 <div align="center">
+
+  <h2>📍 Meet me next</h2>
+
   <a href="https://insomnihack.ch/" target="_blank" rel="noopener">
-    <img src="assets/insomnihack-logo.png" alt="Insomni'hack" height="60" />
+    <img src="assets/insomnihack-logo.png" 
+         alt="Insomni'hack Lausanne" 
+         width="420"/>
   </a>
 
-  <h2>Meet me next: Insomni’hack — Lausanne 🇨🇭 (March)</h2>
+  <h3>
+    Insomni’hack — Lausanne 🇨🇭 <br/>
+    <sub>March</sub>
+  </h3>
 
   <p>
-    If you’re attending, let’s catch up ☕️<br/>
-    <b>Say hi</b> about offensive security, vuln research, or CVE work.
+    If you're attending, let’s catch up ☕<br/>
+    Offensive security • Vulnerability research • CVEs
   </p>
 
   <a href="https://www.linkedin.com/in/georgpheheise/" target="_blank" rel="noopener">
-    <img src="https://img.shields.io/badge/DM%20me%20on-LinkedIn-00ff41?style=for-the-badge" alt="DM on LinkedIn" />
+    <img src="https://img.shields.io/badge/DM%20me%20on-LinkedIn-0A66C2?style=for-the-badge&logo=linkedin&logoColor=white" />
   </a>
+
 </div>
 
 ---
