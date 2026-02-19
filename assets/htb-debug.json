@@ -14,45 +14,38 @@
     "ok": true,
     "error": ""
   },
-  "miniprolabs_probe": {
-    "used": null,
-    "ok": false,
-    "errors": [
-      "https://labs.hackthebox.com/api/v4/minipro-labs -> HTTPError: HTTP Error 404: Not Found",
-      "https://labs.hackthebox.com/api/v4/mini-pro-labs -> HTTPError: HTTP Error 404: Not Found",
-      "https://labs.hackthebox.com/api/v4/mini-prolabs -> HTTPError: HTTP Error 404: Not Found",
-      "https://labs.hackthebox.com/api/v4/miniprolabs -> HTTPError: HTTP Error 404: Not Found",
-      "https://labs.hackthebox.com/api/v4/prolabs/mini -> HTTPError: HTTP Error 404: Not Found",
-      "https://labs.hackthebox.com/api/v4/prolabs/mini-pro-labs -> HTTPError: HTTP Error 404: Not Found",
-      "https://labs.hackthebox.com/api/v4/endgames -> HTTPError: HTTP Error 404: Not Found",
-      "https://labs.hackthebox.com/api/v4/endgame -> HTTPError: HTTP Error 404: Not Found",
-      "https://labs.hackthebox.com/api/v4/endgames/list -> HTTPError: HTTP Error 404: Not Found"
-    ]
-  },
-  "challenges_probe": {
+  "challenges": {
     "used": "https://labs.hackthebox.com/api/v4/challenge/list",
     "ok": true,
-    "errors": []
+    "error": ""
   },
   "season_probe": {
     "used": null,
-    "ok": false,
     "errors": [
       "https://labs.hackthebox.com/api/v4/seasons -> HTTPError: HTTP Error 404: Not Found",
       "https://labs.hackthebox.com/api/v4/season -> HTTPError: HTTP Error 404: Not Found",
       "https://labs.hackthebox.com/api/v4/seasons/me -> HTTPError: HTTP Error 404: Not Found",
       "https://labs.hackthebox.com/api/v4/season/me -> HTTPError: HTTP Error 404: Not Found",
+      "https://labs.hackthebox.com/api/v4/seasons/current -> HTTPError: HTTP Error 404: Not Found",
+      "https://labs.hackthebox.com/api/v4/season/current -> HTTPError: HTTP Error 404: Not Found",
       "https://labs.hackthebox.com/api/v4/seasons/profile/378794 -> HTTPError: HTTP Error 404: Not Found",
       "https://labs.hackthebox.com/api/v4/season/profile/378794 -> HTTPError: HTTP Error 404: Not Found",
       "https://labs.hackthebox.com/api/v4/competitive/seasons -> HTTPError: HTTP Error 404: Not Found",
       "https://labs.hackthebox.com/api/v4/competitive/season -> HTTPError: HTTP Error 404: Not Found",
       "https://labs.hackthebox.com/api/v4/seasonal -> HTTPError: HTTP Error 404: Not Found",
-      "https://labs.hackthebox.com/api/v4/seasonal/me -> HTTPError: HTTP Error 404: Not Found"
+      "https://labs.hackthebox.com/api/v4/seasonal/me -> HTTPError: HTTP Error 404: Not Found",
+      "https://labs.hackthebox.com/api/v4/user/378794/seasons -> HTTPError: HTTP Error 404: Not Found",
+      "https://labs.hackthebox.com/api/v4/user/seasons/378794 -> HTTPError: HTTP Error 404: Not Found",
+      "https://app.hackthebox.com/api/v4/seasons -> JSONDecodeError: Expecting value: line 1 column 1 (char 0)",
+      "https://app.hackthebox.com/api/v4/seasons/me -> JSONDecodeError: Expecting value: line 1 column 1 (char 0)",
+      "https://app.hackthebox.com/api/v4/seasons/current -> JSONDecodeError: Expecting value: line 1 column 1 (char 0)",
+      "https://www.hackthebox.com/api/v4/seasons -> HTTPError: HTTP Error 404: Not Found",
+      "https://www.hackthebox.com/api/v4/seasons/me -> HTTPError: HTTP Error 404: Not Found",
+      "https://www.hackthebox.com/api/v4/seasons/current -> HTTPError: HTTP Error 404: Not Found"
     ]
   },
   "extras": {
     "prolabs": "11/30",
-    "miniprolabs": "\u2014/\u2014",
     "fortresses": "6/6",
     "completed": [
       "Dante",
@@ -65,13 +58,7 @@
       "Intercept",
       "Kaiju",
       "Klendathu",
-      "Heron",
-      "AWS",
-      "Faraday",
-      "Synacktiv",
-      "Context",
-      "Akerva",
-      "Jet"
+      "Heron"
     ],
     "challenges": "23/188",
     "season_rank": "\u2014",
