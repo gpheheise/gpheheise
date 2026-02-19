@@ -2,11 +2,11 @@ name: Update HTB card
 
 on:
   schedule:
-    - cron: "0 6 * * *"   # runs daily at 06:00 UTC
-  workflow_dispatch:      # allows manual run from Actions tab
+    - cron: "0 6 * * *"   # Runs daily at 06:00 UTC
+  workflow_dispatch:     # Allows manual execution
 
 permissions:
-  contents: write          # required to commit updated SVG
+  contents: write        # Required to push updated SVG
 
 jobs:
   build:
@@ -27,7 +27,9 @@ jobs:
         env:
           HTB_TOKEN: ${{ secrets.HTB_TOKEN }}
         run: |
+          echo "Running HTB card generator..."
           python scripts/build_htb_card.py
+          echo "Generated assets:"
           ls -la assets || true
           git status --porcelain
 
