@@ -11,17 +11,17 @@ I focus on real-world exploitation, responsible disclosure, and building practic
 <div align="center">
 
   <h2>📍 Meet me next</h2>
-
+<h3>
+  🇨🇭 <strong style="font-size: 1.4em;">Insomni'hack — Lausanne</strong> (March 2026)<br/>
+  <sub>March</sub>
+</h3>
   <a href="https://insomnihack.ch/" target="_blank" rel="noopener">
     <img src="assets/insomnihack-logo.png" 
          alt="Insomni'hack Lausanne" 
          width="420"/>
   </a>
 
- <h3>
-  🇨🇭 <strong style="font-size: 1.4em;">Insomni'hack — Lausanne</strong> (March 2026)<br/>
-  <sub>March</sub>
-</h3>
+ 
 
   <p>
   
