@@ -19,20 +19,20 @@ I focus on real-world exploitation, responsible disclosure, and building practic
   </a>
 
   <h3>
-    Insomni’hack — Lausanne 🇨🇭 <br/>
+    # 🇨🇭 Insomni'hack — Lausanne (March 2026) <br/>
     <sub>March</sub>
   </h3>
 
   <p>
   
-# 🇨🇭 Insomni'hack — Lausanne (March 2026)
-If you're attending, let’s catch up ☕  
-Security research • CVEs • Red Team engineering
-# 🇩🇪 BSides Munich (2026)
-Always happy to meet the community.
 
-# 🇳🇱 Black Hat Europe (TBD)
-Open for collaborations & hallway discussions.
+## 🗓 Further Upcoming Events
+
+| Event | Location | Date |
+|-------|----------|------|
+| Insomni'hack | Lausanne 🇨🇭 | March 2026 |
+| BSides Munich | Munich 🇩🇪 | 2026 |
+| Black Hat Europe | London 🇬🇧 | TBD |
 
 
   </p>
