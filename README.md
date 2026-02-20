@@ -101,14 +101,19 @@ I focus on real-world exploitation, responsible disclosure, and building practic
 
 **Full list:** https://github.com/gpheheise/All-Awareded-CVE-List
 
-![CVE timeline](assets/cve-timeline.svg)
+<div align="center">
+  <img src="assets/cve-timeline.svg" width="1200" />
+</div>
 
 
 ---
 
 ## 🧩 Hack The Box
 
-[![Hack The Box Card](assets/htb-card.svg)](https://app.hackthebox.com/public/users/378794)
+
+<div align="center">
+  <img src="assets/htb-card.svg" width="1200" />
+</div>
 
 ---
 
