@@ -67,13 +67,6 @@ I focus on practical exploitation, responsible disclosure, and building security
 
 ![CVE timeline](assets/cve-timeline.svg)
 
-## 🛡 CVE Contributions
-
-**Full list:** https://github.com/gpheheise/All-Awareded-CVE-List
-
-![CVE timeline](assets/cve-timeline.svg)
-
----
 
 ---
 
