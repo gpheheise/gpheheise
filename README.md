@@ -46,6 +46,55 @@ I focus on practical exploitation, responsible disclosure, and building security
 
 ---
 
+## 🛠 Technical Expertise
+
+### Offensive Security
+- Network & Infrastructure Assessments  
+- Red Teaming & Active Direcotry
+- Web Application Penetration Testing 
+- Purple Teaming  
+- Vulnerability Discovery & Responsible Disclosure  
+
+### Development & Tooling
+- Python automation for security testing  
+- Bash scripting  
+- Custom exploit PoCs  
+- Lab & containerized test environments
+
+## 🛡 CVE Contributions
+
+**Full list:** https://github.com/gpheheise/All-Awareded-CVE-List
+
+![CVE timeline](assets/cve-timeline.svg)
+
+---
+
+## 🧩 Hack The Box
+
+[![Hack The Box Card](assets/htb-card.svg)](https://app.hackthebox.com/public/users/378794)
+
+---
+
+## 📬 Connect
+
+<div align="left">
+
+<a href="https://www.linkedin.com/in/georgpheheise/" target="_blank">
+  <img src="https://img.shields.io/badge/LinkedIn-0A66C2?style=for-the-badge&logo=linkedin&logoColor=white" />
+</a>
+
+<a href="https://medium.com/@gpheheise" target="_blank">
+  <img src="https://img.shields.io/badge/Medium-000000?style=for-the-badge&logo=medium&logoColor=white" />
+</a>
+
+<a href="https://x.com/gpheheise" target="_blank">
+  <img src="https://img.shields.io/badge/X-000000?style=for-the-badge&logo=x&logoColor=white" />
+</a>
+
+</div>
+
+---
+
 ## 🔬 Research & Publications
 
 I regularly publish technical research, security findings, and deep dives:
@@ -107,30 +156,6 @@ If you’re organizing a meetup or conference, I’m open to speaking opportunit
 
 ---
 
-## 🧩 Hack The Box
 
-[![Hack The Box Card](assets/htb-card.svg)](https://app.hackthebox.com/public/users/378794)
-
----
-
-## 📬 Connect
-
-<div align="left">
-
-<a href="https://www.linkedin.com/in/georgpheheise/" target="_blank">
-  <img src="https://img.shields.io/badge/LinkedIn-0A66C2?style=for-the-badge&logo=linkedin&logoColor=white" />
-</a>
-
-<a href="https://medium.com/@gpheheise" target="_blank">
-  <img src="https://img.shields.io/badge/Medium-000000?style=for-the-badge&logo=medium&logoColor=white" />
-</a>
-
-<a href="https://x.com/gpheheise" target="_blank">
-  <img src="https://img.shields.io/badge/X-000000?style=for-the-badge&logo=x&logoColor=white" />
-</a>
-
-</div>
-
----
 
 > Passionate about improving security through research, transparency, and practical knowledge sharing.
