@@ -1,10 +1,11 @@
+#!/usr/bin/env python3
 import html
 import json
 import os
 import pathlib
 import re
-import urllib.request
 import urllib.error
+import urllib.request
 from datetime import datetime
 from typing import Any, Optional
 
@@ -20,8 +21,9 @@ PROLAB_ENDPOINT = "https://labs.hackthebox.com/api/v4/prolabs"
 FORTRESS_ENDPOINT = "https://labs.hackthebox.com/api/v4/fortresses"
 CHALLENGE_LIST_ENDPOINT = "https://labs.hackthebox.com/api/v4/challenge/list"
 
-# ✅ Seasons endpoint you found
+# Seasons endpoints (the ones you found)
 SEASON_RANKS_ENDPOINT = f"https://labs.hackthebox.com/api/v4/season/user/{HTB_USER_ID}/ranks"
+SEASON_RANK_BY_ID_ENDPOINT = "https://labs.hackthebox.com/api/v4/season/user/rank/{season_id}"
 
 
 def fetch_raw(url: str, token: str) -> tuple[int, str, str]:
@@ -47,12 +49,7 @@ def fetch_raw(url: str, token: str) -> tuple[int, str, str]:
 
 def try_json(url: str, token: str) -> tuple[bool, Any, dict]:
     status, ctype, body = fetch_raw(url, token)
-    meta = {
-        "url": url,
-        "status": status,
-        "content_type": ctype,
-        "snippet": body[:220],
-    }
+    meta = {"url": url, "status": status, "content_type": ctype, "snippet": body[:220]}
     try:
         return True, json.loads(body), meta
     except Exception:
@@ -178,14 +175,33 @@ def wrap_names(names: list[str], max_chars: int = 98) -> list[str]:
     return lines
 
 
-def parse_latest_season(season_payload: Any) -> dict[str, str]:
+def parse_latest_season_meta(season_ranks_payload: Any) -> tuple[Optional[int], str]:
     """
-    Expected shape:
-      {"data":[{...latest season...}, {...older...}]}
-    We take the first element if present.
+    From /season/user/<id>/ranks:
+      {"data":[{season_id, season_name, ...}, ...]}
+    Returns (season_id, season_name) for latest entry.
+    """
+    if not isinstance(season_ranks_payload, dict):
+        return None, "—"
+    data = season_ranks_payload.get("data")
+    if not isinstance(data, list) or not data or not isinstance(data[0], dict):
+        return None, "—"
+    latest = data[0]
+    sid = latest.get("season_id")
+    try:
+        sid_int = int(sid) if sid is not None else None
+    except Exception:
+        sid_int = None
+    sname = str(latest.get("season_name") or "—")
+    return sid_int, sname
+
+
+def parse_season_rank_object(payload: Any) -> dict[str, str]:
+    """
+    From /season/user/rank/<season_id>:
+      {"data":{...}}
     """
     out = {
-        "season_name": "—",
         "season_league": "—",
         "season_rank": "—",
         "season_total_ranks": "—",
@@ -193,29 +209,20 @@ def parse_latest_season(season_payload: Any) -> dict[str, str]:
         "season_flags": "—/—",
         "season_next_flags": "—/—",
     }
-
-    data = None
-    if isinstance(season_payload, dict) and isinstance(season_payload.get("data"), list):
-        data = season_payload["data"]
-
-    if not data:
+    if not isinstance(payload, dict) or not isinstance(payload.get("data"), dict):
         return out
+    d = payload["data"]
 
-    latest = data[0] if isinstance(data[0], dict) else None
-    if not latest:
-        return out
+    out["season_league"] = str(d.get("league") or "—")
+    out["season_rank"] = fmt_num(d.get("rank"))
+    out["season_total_ranks"] = fmt_num(d.get("total_ranks"))
+    out["season_points"] = fmt_num(d.get("total_season_points"))
 
-    out["season_name"] = str(latest.get("season_name") or "—")
-    out["season_league"] = str(latest.get("league") or "—")
-    out["season_rank"] = fmt_num(latest.get("rank"))
-    out["season_total_ranks"] = fmt_num(latest.get("total_ranks"))
-    out["season_points"] = fmt_num(latest.get("total_season_points"))
-
-    tsf = latest.get("total_season_flags")
+    tsf = d.get("total_season_flags")
     if isinstance(tsf, dict):
         out["season_flags"] = fmt_counter(tsf.get("obtained"), tsf.get("total"))
 
-    ftnr = latest.get("flags_to_next_rank")
+    ftnr = d.get("flags_to_next_rank")
     if isinstance(ftnr, dict):
         out["season_next_flags"] = fmt_counter(ftnr.get("obtained"), ftnr.get("total"))
 
@@ -238,7 +245,6 @@ def svg_card(base: dict[str, Any], extras: dict[str, Any]) -> str:
     prolabs = extras.get("prolabs", "—/—")
     fortresses = extras.get("fortresses", "—/—")
 
-    # season fields
     season_name = extras.get("season_name", "—")
     season_league = extras.get("season_league", "—")
     season_rank = extras.get("season_rank", "—")
@@ -249,7 +255,7 @@ def svg_card(base: dict[str, Any], extras: dict[str, Any]) -> str:
 
     completed_lines = wrap_names(extras.get("completed", []), max_chars=98)
 
-    base_h = 340
+    base_h = 360
     per_line = 18
     H = base_h + max(0, (len(completed_lines) - 1)) * per_line + 30
 
@@ -263,7 +269,7 @@ def svg_card(base: dict[str, Any], extras: dict[str, Any]) -> str:
         for y in range(0, H, 4)
     )
 
-    y0 = 305
+    y0 = 325
     completed_svg = "\n  ".join(
         f'<text class="t s" x="{pad}" y="{y0 + i * per_line}">{esc(line)}</text>'
         for i, line in enumerate(completed_lines)
@@ -326,7 +332,7 @@ def svg_card(base: dict[str, Any], extras: dict[str, Any]) -> str:
   <text class="t v" x="{pad+480}" y="240">#{esc(season_rank)}/{esc(season_total_ranks)} · {esc(season_points)} pts · {esc(season_flags)} flags</text>
   <text class="t s muted" x="{pad+480}" y="262">next rank flags: {esc(season_next_flags)}</text>
 
-  <text class="t k" x="{pad}" y="285">COMPLETED PRO LABS</text>
+  <text class="t k" x="{pad}" y="305">COMPLETED PRO LABS</text>
   {completed_svg}
 
   <text class="t k muted" x="{pad}" y="{H-28}">updated {updated}</text>
@@ -341,7 +347,14 @@ def main() -> None:
 
     pathlib.Path("assets").mkdir(parents=True, exist_ok=True)
 
-    debug: dict[str, Any] = {"basic": {}, "prolabs": {}, "fortresses": {}, "challenges": {}, "season": {}, "extras": {}}
+    debug: dict[str, Any] = {
+        "basic": {},
+        "prolabs": {},
+        "fortresses": {},
+        "challenges": {},
+        "season": {},
+        "extras": {},
+    }
 
     # BASIC
     ok, base_payload, meta = try_json(BASIC_ENDPOINT, token)
@@ -349,6 +362,7 @@ def main() -> None:
     if not ok or not isinstance(base_payload, dict):
         OUT_DEBUG.write_text(json.dumps(debug, indent=2), encoding="utf-8")
         raise SystemExit("Failed to fetch basic profile payload.")
+
     base = base_payload.get("profile") if isinstance(base_payload.get("profile"), dict) else base_payload
 
     extras: dict[str, Any] = {
@@ -356,7 +370,6 @@ def main() -> None:
         "fortresses": "—/—",
         "completed": [],
         "challenges": "—/—",
-        # season
         "season_name": "—",
         "season_league": "—",
         "season_rank": "—",
@@ -385,7 +398,7 @@ def main() -> None:
             done, total, _ = extract_done_total_from_list(items)
             extras["fortresses"] = fmt_counter(done, total)
 
-    # CHALLENGES (active list)
+    # CHALLENGES
     ok, payload, meta = try_json(CHALLENGE_LIST_ENDPOINT, token)
     debug["challenges"] = {"ok": ok, **meta}
     if ok:
@@ -405,17 +418,26 @@ def main() -> None:
             )
             extras["challenges"] = fmt_counter(solved, total)
 
-    # SEASON (new endpoint)
-    ok, payload, meta = try_json(SEASON_RANKS_ENDPOINT, token)
-    debug["season"] = {"ok": ok, **meta}
-    if ok and payload is not None:
-        s = parse_latest_season(payload)
-        extras.update(s)
+    # SEASON (latest season_id -> stats object)
+    ok, ranks_payload, meta = try_json(SEASON_RANKS_ENDPOINT, token)
+    debug["season"]["ranks"] = {"ok": ok, **meta}
+
+    season_id, season_name = (None, "—")
+    if ok and ranks_payload is not None:
+        season_id, season_name = parse_latest_season_meta(ranks_payload)
+        extras["season_name"] = season_name
+
+    if season_id is not None:
+        url = SEASON_RANK_BY_ID_ENDPOINT.format(season_id=season_id)
+        ok2, rank_payload, meta2 = try_json(url, token)
+        debug["season"]["rank_by_id"] = {"ok": ok2, **meta2}
+        if ok2 and rank_payload is not None:
+            extras.update(parse_season_rank_object(rank_payload))
 
     debug["extras"] = extras
     OUT_DEBUG.write_text(json.dumps(debug, indent=2), encoding="utf-8")
-
     OUT_SVG.write_text(svg_card(base, extras), encoding="utf-8")
+
     print(f"Wrote {OUT_SVG}")
     print(f"Wrote {OUT_DEBUG}")
 
