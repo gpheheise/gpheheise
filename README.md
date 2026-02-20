@@ -97,7 +97,7 @@ I focus on real-world exploitation, responsible disclosure, and building practic
 - Custom exploit PoCs  
 - Lab & containerized test environments
 
-## 🛡 CVE Contributions
+## 🛡 CVE / Zero-Days
 
 **Full list:** https://github.com/gpheheise/All-Awareded-CVE-List
 
