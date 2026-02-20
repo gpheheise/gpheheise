@@ -1,3 +1,4 @@
+#!/usr/bin/env python3
 import collections
 import datetime
 import pathlib
@@ -5,113 +6,134 @@ import re
 import urllib.request
 
 
+CVE_LIST_URL = "https://raw.githubusercontent.com/gpheheise/All-Awareded-CVE-List/main/README.md"
+
+
+def clamp(v: float, lo: float, hi: float) -> float:
+    return max(lo, min(hi, v))
+
+
 def main() -> None:
     out_dir = pathlib.Path("assets")
     out_dir.mkdir(parents=True, exist_ok=True)
 
-    url = "https://raw.githubusercontent.com/gpheheise/All-Awareded-CVE-List/main/README.md"
-    md = urllib.request.urlopen(url, timeout=30).read().decode("utf-8", errors="replace")
+    md = urllib.request.urlopen(CVE_LIST_URL, timeout=30).read().decode("utf-8", errors="replace")
 
-    awarded = re.findall(r"\bCVE-(\d{4})-\d{4,}\b", md)
-    pending = re.findall(r"CVE-PENDING", md)
+    # Awarded CVEs: capture year
+    awarded_years = [int(y) for y in re.findall(r"\bCVE-(\d{4})-\d{4,}\b", md)]
 
-    awarded_years = [int(y) for y in awarded]
+    # Pending CVEs: your list uses "CVE-PENDING"
+    pending_count = len(re.findall(r"\bCVE-PENDING\b", md))
     current_year = datetime.date.today().year
 
     awarded_by_year = collections.Counter(awarded_years)
-    pending_by_year = collections.Counter({current_year: len(pending)})
+    # If you later encode pending years, change this. For now, assign all pending to current year.
+    pending_by_year = collections.Counter({current_year: pending_count})
 
-    all_years = sorted(set(awarded_by_year.keys()) | set(pending_by_year.keys()))
-
-    if all_years:
-        min_y, max_y = min(all_years), max(all_years)
-    else:
-        min_y = max_y = current_year
-
-    W, H = 1000, 220
-    pad = 60
-    bar_h = 90
-    base_y = 170
-
+    all_years = sorted(set(awarded_by_year.keys()) | set(pending_by_year.keys()) | {current_year})
+    min_y, max_y = min(all_years), max(all_years)
     years_list = list(range(min_y, max_y + 1))
 
+    # Canvas
+    W, H = 1200, 260
+    pad_l, pad_r = 70, 70
+    pad_t = 22
+
+    base_y = 190          # baseline for bars (x-axis)
+    bar_area_h = 110      # max bar height
+
+    # Slot geometry
+    n = max(1, len(years_list))
+    slot_w = (W - pad_l - pad_r) / n
+
+    # Bar geometry inside a slot:
+    # Two bars (pending + awarded) placed side-by-side, centered in slot.
+    bar_w = slot_w * 0.26
+    gap = slot_w * 0.10
+    total_pair_w = 2 * bar_w + gap
+
+    # Scale
     max_val = max(
-        [awarded_by_year.get(y, 0) for y in years_list] +
-        [pending_by_year.get(y, 0) for y in years_list] +
-        [1]
+        [awarded_by_year.get(y, 0) for y in years_list]
+        + [pending_by_year.get(y, 0) for y in years_list]
+        + [1]
     )
-
-    bar_w = (W - 2 * pad) / max(1, len(years_list))
-
-    svg = []
-    svg.append(f'<svg xmlns="http://www.w3.org/2000/svg" width="{W}" height="{H}" viewBox="0 0 {W} {H}">')
-
-    svg.append("<defs><style>")
-    svg.append("""
-text {
-    font-family: Consolas, Monaco, 'Courier New', monospace;
-    fill: #00ff41;
-}
-.small { font-size: 12px; }
-.big { font-size: 18px; font-weight: 700; }
-.awarded { fill: #ff0033; }
-.pending { fill: #0099ff; }
-.bg { fill: #000000; }
-.axis { stroke: #00ff41; stroke-width: 1; }
-.legend { font-size: 12px; fill: #00ff41; }
-""")
-    svg.append("</style></defs>")
-
-    # Background
-    svg.append(f'<rect class="bg" x="0" y="0" width="{W}" height="{H}" />')
 
     total_awarded = sum(awarded_by_year.values())
-    total_pending = len(pending)
+    total_pending = pending_count
 
-    svg.append(f'<text class="big" x="{pad}" y="40">CVE TIMELINE :: SECURITY RESEARCH</text>')
+    svg: list[str] = []
+    svg.append(f'<svg xmlns="http://www.w3.org/2000/svg" width="{W}" height="{H}" viewBox="0 0 {W} {H}">')
+    svg.append("<defs>")
+    svg.append("""
+<style>
+  .bg { fill: #000; }
+  .title { font-family: Consolas, Monaco, "Courier New", monospace; fill: #00ff41; font-size: 20px; font-weight: 700; }
+  .sub { font-family: Consolas, Monaco, "Courier New", monospace; fill: #00ff41; font-size: 14px; opacity: 0.85; }
+  .axis { stroke: #00ff41; stroke-width: 1; opacity: 0.35; }
+  .year { font-family: Consolas, Monaco, "Courier New", monospace; fill: #00ff41; font-size: 12px; opacity: 0.85; }
+  .awarded { fill: #ff0033; opacity: 0.92; }
+  .pending { fill: #1e90ff; opacity: 0.92; }
+  .legend { font-family: Consolas, Monaco, "Courier New", monospace; fill: #00ff41; font-size: 12px; opacity: 0.9; }
+</style>
+""".strip())
+    svg.append("</defs>")
+
+    # Background
+    svg.append(f'<rect class="bg" x="0" y="0" width="{W}" height="{H}"/>')
+
+    # Header
+    svg.append(f'<text class="title" x="{pad_l}" y="{pad_t + 22}">CVE TIMELINE :: SECURITY RESEARCH</text>')
     svg.append(
-        f'<text class="small" x="{pad}" y="65">'
-        f'> Awarded: {total_awarded}  |  Pending: {total_pending}'
-        f'</text>'
+        f'<text class="sub" x="{pad_l}" y="{pad_t + 46}">&gt; Awarded: {total_awarded} | Pending: {total_pending}</text>'
     )
 
-    svg.append(f'<line class="axis" x1="{pad}" y1="{base_y}" x2="{W-pad}" y2="{base_y}" />')
+    # X axis
+    svg.append(f'<line class="axis" x1="{pad_l}" y1="{base_y}" x2="{W - pad_r}" y2="{base_y}"/>')
 
-    for i, y in enumerate(years_list):
-        awarded_val = awarded_by_year.get(y, 0)
-        pending_val = pending_by_year.get(y, 0)
+    # Bars + Years
+    for i, year in enumerate(years_list):
+        awarded_val = awarded_by_year.get(year, 0)
+        pending_val = pending_by_year.get(year, 0)
 
-        awarded_height = (awarded_val / max_val) * bar_h
-        pending_height = (pending_val / max_val) * bar_h
+        # Slot center
+        slot_x0 = pad_l + i * slot_w
+        x_center = slot_x0 + slot_w / 2
 
-        x = pad + i * bar_w
-        half = bar_w / 2
+        # Left bar (pending), right bar (awarded)
+        pair_left = x_center - total_pair_w / 2
+        x_pending = pair_left
+        x_awarded = pair_left + bar_w + gap
 
-        # Awarded (red)
+        # Heights
+        h_awarded = (awarded_val / max_val) * bar_area_h
+        h_pending = (pending_val / max_val) * bar_area_h
+
+        y_awarded = base_y - h_awarded
+        y_pending = base_y - h_pending
+
+        # Draw bars (only if > 0, but safe to draw zero-height too)
         svg.append(
-            f'<rect class="awarded" x="{x + 4:.2f}" '
-            f'y="{base_y - awarded_height:.2f}" '
-            f'width="{half - 8:.2f}" height="{awarded_height:.2f}" />'
+            f'<rect class="pending" x="{x_pending:.2f}" y="{y_pending:.2f}" '
+            f'width="{bar_w:.2f}" height="{h_pending:.2f}"/>'
+        )
+        svg.append(
+            f'<rect class="awarded" x="{x_awarded:.2f}" y="{y_awarded:.2f}" '
+            f'width="{bar_w:.2f}" height="{h_awarded:.2f}"/>'
         )
 
-        # Pending (blue)
+        # Year label centered under slot
         svg.append(
-            f'<rect class="pending" x="{x + half + 4:.2f}" '
-            f'y="{base_y - pending_height:.2f}" '
-            f'width="{half - 8:.2f}" height="{pending_height:.2f}" />'
+            f'<text class="year" x="{x_center:.2f}" y="{base_y + 22}" text-anchor="middle">{year}</text>'
         )
 
-        svg.append(
-            f'<text class="small" x="{x + bar_w/2:.2f}" '
-            f'y="{base_y + 18}" text-anchor="middle">{y}</text>'
-        )
-
-    # Legend
-    svg.append(f'<rect class="awarded" x="{W-260}" y="35" width="14" height="14" />')
-    svg.append(f'<text class="legend" x="{W-235}" y="47">AWARDED</text>')
-
-    svg.append(f'<rect class="pending" x="{W-150}" y="35" width="14" height="14" />')
-    svg.append(f'<text class="legend" x="{W-125}" y="47">PENDING</text>')
+    # Legend (bottom-right)
+    lx = W - pad_r - 240
+    ly = pad_t + 24
+    svg.append(f'<rect class="awarded" x="{lx}" y="{ly}" width="14" height="14"/>')
+    svg.append(f'<text class="legend" x="{lx + 22}" y="{ly + 12}">AWARDED</text>')
+    svg.append(f'<rect class="pending" x="{lx}" y="{ly + 22}" width="14" height="14"/>')
+    svg.append(f'<text class="legend" x="{lx + 22}" y="{ly + 34}">PENDING</text>')
 
     svg.append("</svg>")
 
