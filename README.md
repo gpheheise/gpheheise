@@ -78,9 +78,10 @@ If you’re organizing a meetup or conference, I’m open to speaking opportunit
 ## 🛠 Technical Expertise
 
 ### Offensive Security
-- Web Application Penetration Testing  
 - Network & Infrastructure Assessments  
-- Red Teaming Support  
+- Red Teaming & Active Direcotry
+- Web Application Penetration Testing 
+- Purple Teaming  
 - Vulnerability Discovery & Responsible Disclosure  
 
 ### Development & Tooling
