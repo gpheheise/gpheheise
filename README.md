@@ -2,8 +2,8 @@
 
 # 👋 Hi, I’m Georg (aka 0x01r3ddw4rf)
 
-Senior Offensive Security Consultant specializing in offensive security engineering, penetration testing, and vulnerability research.  
-I focus on practical exploitation, responsible disclosure, and building security tooling for real-world environments.
+Senior Offensive Security Consultant specializing in offensive security engineering, advanced penetration testing, and vulnerability research.
+I focus on real-world exploitation, responsible disclosure, and building practical security tooling that strengthens enterprise environments.
 
 
 <!-- MEET ME NEXT -->
