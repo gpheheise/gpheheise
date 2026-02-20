@@ -6,7 +6,7 @@ Senior Offensive Security Consultant specializing in offensive security engineer
 I focus on real-world exploitation, responsible disclosure, and building practical security tooling that strengthens enterprise environments.
 
 
-<!-- MEET ME NEXT -->
+<!-- 🌍 Where to Meet Me Next-->
 
 <div align="center">
 
@@ -24,25 +24,19 @@ I focus on real-world exploitation, responsible disclosure, and building practic
   </h3>
 
   <p>
-   ---
-
-## 🌍 Where to Meet Me Next
-
+  
 ### 🇨🇭 Insomni'hack — Lausanne (March 2026)
 If you're attending, let’s catch up ☕  
 Security research • CVEs • Red Team engineering
 
----
-
 ### 🇩🇪 BSides Munich (2026)
 Always happy to meet the community.
 
----
 
 ### 🇳🇱 Black Hat Europe (TBD)
 Open for collaborations & hallway discussions.
 
----
+
   </p>
 
   <a href="https://www.linkedin.com/in/georgpheheise/" target="_blank" rel="noopener">
