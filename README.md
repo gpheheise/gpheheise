@@ -34,7 +34,7 @@ I focus on real-world exploitation, responsible disclosure, and building practic
 <tr>
 <td valign="top">
 
-### 🎤 Speaking
+### 🎤 Speaking 2026
 
 | Event | Location | Date |
 |-------|----------|------|
@@ -47,12 +47,12 @@ I focus on real-world exploitation, responsible disclosure, and building practic
 
 <td valign="top">
 
-### 🤝 Attending
+### 🤝 Attending 2026
 
 | Event | Location | Date |
 |-------|----------|------|
-| Insomni'hack | Lausanne 🇨🇭 | 2026 |
-| Elbsides | Hamburg 🇩🇪 | TBD |
+| Insomni'hack | Lausanne 🇨🇭 | 18/19 March 2026 |
+| Elbsides | Hamburg 🇩🇪 | 5th June 2026 |
 
 </td>
 </tr>
