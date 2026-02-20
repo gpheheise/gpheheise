@@ -93,12 +93,11 @@ If you’re organizing a meetup or conference, I’m open to speaking opportunit
 
 ---
 
-### 🔵 BSides Tirana (2025)  
+### 🔴 BSides Tirana (2025)  
 **Breaking Bad AD — What Red Teams Wish You'd Fix Yesterday**
 
 *(Recording coming soon)*
 
----
 
 <div align="center">
   <img src="assets/confs/bsidesdresden.png" height="84" alt="BSides Dresden" />
