@@ -76,22 +76,34 @@ I focus on practical exploitation, responsible disclosure, and building security
 
 ---
 
-
-
 ## 🎤 Talks & Conference Presence
 I’ve presented research and technical work across multiple security communities and events — from offensive security topics to vulnerability research and real-world findings.  
 If you’re organizing a meetup or conference, I’m open to speaking opportunities.
 
-**Recent / notable appearances (sample):**
-- Bsides Dresden — The AI Ad Apocalypse Unmasking Youtube Ads That Drain macOS Crypto Wallets (2025)
-- Bsides Tirana — Breaking Bad AD - What Red Teams Wish You'd Fix Yesterday (2025)
+---
 
+### 🟣 BSides Dresden (2025)  
+**The AI Ad Apocalypse — Unmasking YouTube Ads That Drain macOS Crypto Wallets**
+
+<a href="https://youtu.be/GK5GfjHmJ0s" target="_blank">
+  <img src="https://img.youtube.com/vi/GK5GfjHmJ0s/maxresdefault.jpg" width="720" alt="Watch the BSides Dresden Talk"/>
+</a>
+
+▶️ Full recording available on YouTube
+
+---
+
+### 🔵 BSides Tirana (2025)  
+**Breaking Bad AD — What Red Teams Wish You'd Fix Yesterday**
+
+*(Recording coming soon)*
+
+---
 
 <div align="center">
-  <img src="assets/confs/bsidestirana.png" height="84" alt="BSides" />
-  <img src="assets/confs/bsidesdresden.png" height="84" alt="Conference" />
+  <img src="assets/confs/bsidesdresden.png" height="84" alt="BSides Dresden" />
+  <img src="assets/confs/bsidestirana.png" height="84" alt="BSides Tirana" />
 </div>
-
 
 ---
 
