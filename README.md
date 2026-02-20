@@ -18,10 +18,10 @@ I focus on real-world exploitation, responsible disclosure, and building practic
          width="420"/>
   </a>
 
-  <h3>
-    # 🇨🇭 Insomni'hack — Lausanne (March 2026) <br/>
-    <sub>March</sub>
-  </h3>
+ <h3>
+  🇨🇭 <strong style="font-size: 1.4em;">Insomni'hack — Lausanne</strong> (March 2026)<br/>
+  <sub>March</sub>
+</h3>
 
   <p>
   
@@ -38,8 +38,8 @@ I focus on real-world exploitation, responsible disclosure, and building practic
 
 | Event | Location | Date |
 |-------|----------|------|
-| Insomni'hack | Lausanne 🇨🇭 | March 2026 |
-| BSides Berlin | Berlin 🇩🇪 | TBD |
+| - | - |TBD |
+|- | TBD |
 
 </td>
 
@@ -51,8 +51,8 @@ I focus on real-world exploitation, responsible disclosure, and building practic
 
 | Event | Location | Date |
 |-------|----------|------|
-| BSides Munich | Munich 🇩🇪 | 2026 |
-| Black Hat Europe | London 🇬🇧 | TBD |
+| Insomni'hack | Lausanne 🇨🇭 | 2026 |
+| Elbsides | Hamburg 🇩🇪 | TBD |
 
 </td>
 </tr>
