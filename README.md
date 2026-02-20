@@ -67,11 +67,78 @@ I focus on practical exploitation, responsible disclosure, and building security
 
 ![CVE timeline](assets/cve-timeline.svg)
 
+## 🛡 CVE Contributions
+
+**Full list:** https://github.com/gpheheise/All-Awareded-CVE-List
+
+![CVE timeline](assets/cve-timeline.svg)
+
+---
+
 ---
 
 ## 🧩 Hack The Box
 
 [![Hack The Box Card](assets/htb-card.svg)](https://app.hackthebox.com/public/users/378794)
+
+---
+
+
+
+## 🎤 Talks & Conference Presence
+I’ve presented research and technical work across multiple security communities and events — from offensive security topics to vulnerability research and real-world findings.  
+If you’re organizing a meetup or conference, I’m open to speaking opportunities.
+
+**Recent / notable appearances (sample):**
+- Bsides Dresden — The AI Ad Apocalypse Unmasking Youtube Ads That Drain macOS Crypto Wallets (2025)
+- Bsides Tirana — Breaking Bad AD - What Red Teams Wish You'd Fix Yesterday (2025)
+
+
+<div align="center">
+  <img src="assets/confs/bsidestirana.png" height="84" alt="BSides" />
+  <img src="assets/confs/bsidesdresden.png" height="84" alt="Conference" />
+</div>
+
+
+---
+
+## 🔬 Research & Publications
+
+I regularly publish technical research, security findings, and deep dives:
+
+- ✍ **Medium (Research Write-ups & Technical Articles)**  
+  👉 https://medium.com/@gpheheise  
+
+- 📄 **LinkedIn Articles (Security Research & Professional Publications)**  
+  👉 https://www.linkedin.com/in/georgpheheise/recent-activity/articles/
+
+These publications cover vulnerability analysis, exploitation concepts, practical security assessments, and lessons learned from offensive security engagements.
+
+---
+
+## 🛠 Technical Expertise
+
+### Offensive Security
+- Network & Infrastructure Assessments  
+- Red Teaming & Active Direcotry
+- Web Application Penetration Testing 
+- Purple Teaming  
+- Vulnerability Discovery & Responsible Disclosure  
+
+### Development & Tooling
+- Python automation for security testing  
+- Bash scripting  
+- Custom exploit PoCs  
+- Lab & containerized test environments
+
+
+
+## 📂 What You’ll Find on This GitHub
+
+- 🔍 Security research projects  
+- 🧪 Exploit Proof-of-Concept implementations  
+- 🛠 Custom penetration testing tooling  
+- 📚 Lab environments and security experiments  
 
 ---
 
@@ -94,68 +161,6 @@ I focus on practical exploitation, responsible disclosure, and building security
 </div>
 
 ---
-
-## 🔬 Research & Publications
-
-I regularly publish technical research, security findings, and deep dives:
-
-- ✍ **Medium (Research Write-ups & Technical Articles)**  
-  👉 https://medium.com/@gpheheise  
-
-- 📄 **LinkedIn Articles (Security Research & Professional Publications)**  
-  👉 https://www.linkedin.com/in/georgpheheise/recent-activity/articles/
-
-These publications cover vulnerability analysis, exploitation concepts, practical security assessments, and lessons learned from offensive security engagements.
-
----
-
-
-## 🎤 Talks & Conference Presence
-I’ve presented research and technical work across multiple security communities and events — from offensive security topics to vulnerability research and real-world findings.  
-If you’re organizing a meetup or conference, I’m open to speaking opportunities.
-
-**Recent / notable appearances (sample):**
-- Bsides Dresden — The AI Ad Apocalypse Unmasking Youtube Ads That Drain macOS Crypto Wallets (2025)
-- Bsides Tirana — Breaking Bad AD - What Red Teams Wish You'd Fix Yesterday (2025)
-
-
-<div align="center">
-  <img src="assets/confs/bsidestirana.png" height="84" alt="BSides" />
-  <img src="assets/confs/bsidesdresden.png" height="84" alt="Conference" />
-</div>
-
-## 🛠 Technical Expertise
-
-### Offensive Security
-- Network & Infrastructure Assessments  
-- Red Teaming & Active Direcotry
-- Web Application Penetration Testing 
-- Purple Teaming  
-- Vulnerability Discovery & Responsible Disclosure  
-
-### Development & Tooling
-- Python automation for security testing  
-- Bash scripting  
-- Custom exploit PoCs  
-- Lab & containerized test environments
-
-## 🛡 CVE Contributions
-
-**Full list:** https://github.com/gpheheise/All-Awareded-CVE-List
-
-![CVE timeline](assets/cve-timeline.svg)
-
----
-
-## 📂 What You’ll Find on This GitHub
-
-- 🔍 Security research projects  
-- 🧪 Exploit Proof-of-Concept implementations  
-- 🛠 Custom penetration testing tooling  
-- 📚 Lab environments and security experiments  
-
----
-
 
 
 > Passionate about improving security through research, transparency, and practical knowledge sharing.
