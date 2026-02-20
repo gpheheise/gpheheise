@@ -80,7 +80,7 @@ I focus on practical exploitation, responsible disclosure, and building security
 I’ve presented research and technical work across multiple security communities and events — from offensive security topics to vulnerability research and real-world findings.  
 If you’re organizing a meetup or conference, I’m open to speaking opportunities.
 
----
+
 
 ### 🟣 BSides Dresden (2025)  
 **The AI Ad Apocalypse — Unmasking YouTube Ads That Drain macOS Crypto Wallets**
@@ -91,7 +91,7 @@ If you’re organizing a meetup or conference, I’m open to speaking opportunit
 
 ▶️ Full recording available on YouTube
 
----
+
 
 ### 🔴 BSides Tirana (2025)  
 **Breaking Bad AD — What Red Teams Wish You'd Fix Yesterday**
