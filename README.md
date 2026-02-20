@@ -25,15 +25,14 @@ I focus on real-world exploitation, responsible disclosure, and building practic
 
   <p>
   
-### 🇨🇭 Insomni'hack — Lausanne (March 2026)
+## 🇨🇭 Insomni'hack — Lausanne (March 2026)
 If you're attending, let’s catch up ☕  
 Security research • CVEs • Red Team engineering
 
-### 🇩🇪 BSides Munich (2026)
+## 🇩🇪 BSides Munich (2026)
 Always happy to meet the community.
 
-
-### 🇳🇱 Black Hat Europe (TBD)
+## 🇳🇱 Black Hat Europe (TBD)
 Open for collaborations & hallway discussions.
 
 
