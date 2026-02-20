@@ -26,13 +26,39 @@ I focus on real-world exploitation, responsible disclosure, and building practic
   <p>
   
 
-## 🗓 Further Upcoming Events
+## 🗓 Upcoming Events
+
+<div align="center">
+
+<table>
+<tr>
+<td valign="top">
+
+### 🎤 Speaking
 
 | Event | Location | Date |
 |-------|----------|------|
 | Insomni'hack | Lausanne 🇨🇭 | March 2026 |
+| BSides Berlin | Berlin 🇩🇪 | TBD |
+
+</td>
+
+<td width="60"></td>
+
+<td valign="top">
+
+### 🤝 Attending
+
+| Event | Location | Date |
+|-------|----------|------|
 | BSides Munich | Munich 🇩🇪 | 2026 |
 | Black Hat Europe | London 🇬🇧 | TBD |
+
+</td>
+</tr>
+</table>
+
+</div>
 
 
   </p>
