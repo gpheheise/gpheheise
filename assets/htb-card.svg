@@ -128,16 +128,16 @@
   <text class="t s muted" x="28" y="78">Pro Hacker · https://app.hackthebox.com/public/users/378794</text>
 
   <text class="t k" x="28" y="120">POINTS</text>
-  <text class="t v" x="28" y="145">152</text>
+  <text class="t v" x="28" y="145">192</text>
 
   <text class="t k" x="198" y="120">GLOBAL</text>
   <text class="t v" x="198" y="145">#761</text>
 
   <text class="t k" x="368" y="120">USER OWNS</text>
-  <text class="t v" x="368" y="145">66</text>
+  <text class="t v" x="368" y="145">67</text>
 
   <text class="t k" x="548" y="120">SYSTEM OWNS</text>
-  <text class="t v" x="548" y="145">52</text>
+  <text class="t v" x="548" y="145">53</text>
 
   <text class="t k" x="748" y="120">RESPECTS</text>
   <text class="t v" x="748" y="145">2</text>
@@ -153,12 +153,12 @@
 
   <text class="t k" x="508" y="195">SEASON</text>
   <text class="t s" x="508" y="218">Season 10 · Silver</text>
-  <text class="t v" x="508" y="240">#2790/7930 · 120 pts · 5/26 flags</text>
-  <text class="t s muted" x="508" y="262">next rank flags: 1/7</text>
+  <text class="t v" x="508" y="240">#900/7933 · 185 pts · 7/26 flags</text>
+  <text class="t s muted" x="508" y="262">next rank flags: 3/7</text>
 
   <text class="t k" x="28" y="305">COMPLETED PRO LABS</text>
   <text class="t s" x="28" y="325">Dante · P.O.O · Alchemy · Zephyr · Xen · Offshore · RastaLabs · Intercept · Kaiju · Klendathu</text>
   <text class="t s" x="28" y="343">Heron</text>
 
-  <text class="t k muted" x="28" y="380">updated 2026-02-22 06:40 UTC</text>
+  <text class="t k muted" x="28" y="380">updated 2026-02-22 09:12 UTC</text>
 </svg>
