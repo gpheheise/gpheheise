@@ -131,7 +131,7 @@
   <text class="t v" x="28" y="145">192</text>
 
   <text class="t k" x="198" y="120">GLOBAL</text>
-  <text class="t v" x="198" y="145">#748</text>
+  <text class="t v" x="198" y="145">#745</text>
 
   <text class="t k" x="368" y="120">USER OWNS</text>
   <text class="t v" x="368" y="145">67</text>
@@ -153,12 +153,12 @@
 
   <text class="t k" x="508" y="195">SEASON</text>
   <text class="t s" x="508" y="218">Season 10 · Silver</text>
-  <text class="t v" x="508" y="240">#1999/8181 · 185 pts · 7/26 flags</text>
+  <text class="t v" x="508" y="240">#2115/8270 · 185 pts · 7/26 flags</text>
   <text class="t s muted" x="508" y="262">next rank flags: 3/7</text>
 
   <text class="t k" x="28" y="305">COMPLETED PRO LABS</text>
   <text class="t s" x="28" y="325">Dante · P.O.O · Alchemy · Zephyr · Xen · Offshore · RastaLabs · Intercept · Kaiju · Klendathu</text>
   <text class="t s" x="28" y="343">Heron</text>
 
-  <text class="t k muted" x="28" y="380">updated 2026-02-26 06:53 UTC</text>
+  <text class="t k muted" x="28" y="380">updated 2026-02-27 06:45 UTC</text>
 </svg>
