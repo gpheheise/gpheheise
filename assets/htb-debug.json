@@ -4,14 +4,14 @@
     "url": "https://labs.hackthebox.com/api/v4/user/profile/basic/378794",
     "status": 200,
     "content_type": "application/json",
-    "snippet": "{\"profile\":{\"id\":378794,\"sso_id\":true,\"name\":\"0x01r3ddw4rf\",\"system_owns\":53,\"user_owns\":67,\"user_bloods\":0,\"system_bloods\":0,\"challenge_bloods\":0,\"team\":{\"id\":4231,\"name\":\"LHIND\",\"ranking\":202,\"avatar\":\"\\/teams\\/dd1016d"
+    "snippet": "{\"profile\":{\"id\":378794,\"sso_id\":true,\"name\":\"0x01r3ddw4rf\",\"system_owns\":54,\"user_owns\":68,\"user_bloods\":0,\"system_bloods\":0,\"challenge_bloods\":0,\"team\":{\"id\":4231,\"name\":\"LHIND\",\"ranking\":192,\"avatar\":\"\\/teams\\/dd1016d"
   },
   "prolabs": {
     "ok": true,
     "url": "https://labs.hackthebox.com/api/v4/prolabs",
     "status": 200,
     "content_type": "application/json",
-    "snippet": "{\"status\":true,\"data\":{\"count\":30,\"labs\":[{\"id\":25,\"name\":\"Mythical\",\"release_at\":\"2025-09-30T13:05:24.000000Z\",\"pro_machines_count\":3,\"pro_flags_count\":3,\"state\":\"free\",\"mini\":true,\"identifier\":\"MYTHICAL\",\"content_id\":\""
+    "snippet": "{\"status\":true,\"data\":{\"count\":33,\"labs\":[{\"id\":25,\"name\":\"Mythical\",\"release_at\":\"2025-09-30T13:05:24.000000Z\",\"pro_machines_count\":3,\"pro_flags_count\":3,\"state\":\"free\",\"mini\":true,\"identifier\":\"MYTHICAL\",\"content_id\":\""
   },
   "fortresses": {
     "ok": true,
@@ -33,18 +33,18 @@
       "url": "https://labs.hackthebox.com/api/v4/season/user/378794/ranks",
       "status": 200,
       "content_type": "application/json",
-      "snippet": "{\"data\":[{\"league\":\"Silver\",\"rank\":2818,\"next_rank\":{\"id\":3,\"title\":\"Ruby\",\"requirement\":40},\"total_ranks\":8507,\"rank_suffix\":\"th\",\"total_season_points\":185,\"flags_to_next_rank\":{\"obtained\":3,\"total\":7},\"total_season_fla"
+      "snippet": "{\"data\":[{\"league\":\"Silver\",\"rank\":1458,\"next_rank\":{\"id\":3,\"title\":\"Ruby\",\"requirement\":40},\"total_ranks\":8528,\"rank_suffix\":\"th\",\"total_season_points\":270,\"flags_to_next_rank\":{\"obtained\":5,\"total\":7},\"total_season_fla"
     },
     "rank_by_id": {
       "ok": true,
       "url": "https://labs.hackthebox.com/api/v4/season/user/rank/13",
       "status": 200,
       "content_type": "application/json",
-      "snippet": "{\"data\":{\"league\":\"Silver\",\"rank\":2818,\"next_rank\":{\"id\":3,\"title\":\"Ruby\",\"requirement\":40},\"total_ranks\":8507,\"rank_suffix\":\"th\",\"total_season_points\":185,\"flags_to_next_rank\":{\"obtained\":3,\"total\":7},\"total_season_flag"
+      "snippet": "{\"data\":{\"league\":\"Silver\",\"rank\":1458,\"next_rank\":{\"id\":3,\"title\":\"Ruby\",\"requirement\":40},\"total_ranks\":8528,\"rank_suffix\":\"th\",\"total_season_points\":270,\"flags_to_next_rank\":{\"obtained\":5,\"total\":7},\"total_season_flag"
     }
   },
   "extras": {
-    "prolabs": "11/30",
+    "prolabs": "11/33",
     "fortresses": "6/6",
     "completed": [
       "Dante",
@@ -62,10 +62,10 @@
     "challenges": "23/188",
     "season_name": "Season 10",
     "season_league": "Silver",
-    "season_rank": "2818",
-    "season_total_ranks": "8507",
-    "season_points": "185",
-    "season_flags": "7/26",
-    "season_next_flags": "3/7"
+    "season_rank": "1458",
+    "season_total_ranks": "8528",
+    "season_points": "270",
+    "season_flags": "9/26",
+    "season_next_flags": "5/7"
   }
 }
