@@ -38,7 +38,7 @@ I focus on real-world exploitation, responsible disclosure, and building practic
 
 | Event | Location | Date |
 |-------|----------|------|
-| - | - |TBD |
+| HH.Security #22 | Lotto24 AG/Hamburg |16.04.2026 |
 |- | TBD |
 
 </td>
