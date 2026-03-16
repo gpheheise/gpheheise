@@ -38,7 +38,7 @@ I focus on real-world exploitation, responsible disclosure, and building practic
 
 | Event | Location | Date |
 |-------|----------|------|
-| HH.Security #22 | Lotto24 AG/Hamburg |16.04.2026 |
+| HH.Security #22 | Lotto24 AG/Hamburg |16th April 2026 |
 |- | TBD |
 
 </td>
@@ -51,8 +51,8 @@ I focus on real-world exploitation, responsible disclosure, and building practic
 
 | Event | Location | Date |
 |-------|----------|------|
-| Insomni'hack | Lausanne 🇨🇭 | 18/19 March 2026 |
-| HH.Security #22 | Lotto24 AG/Hamburg |16.04.2026 |
+| Insomni'hack | Lausanne 🇨🇭 | 18/19th March 2026 |
+| HH.Security #22 | Lotto24 AG/Hamburg |16th April 2026 |
 | Elbsides | Hamburg 🇩🇪 | 5th June 2026 |
 
 </td>
