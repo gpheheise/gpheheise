@@ -4,7 +4,7 @@
     "url": "https://labs.hackthebox.com/api/v4/user/profile/basic/378794",
     "status": 200,
     "content_type": "application/json",
-    "snippet": "{\"profile\":{\"id\":378794,\"sso_id\":true,\"name\":\"0x01r3ddw4rf\",\"system_owns\":55,\"user_owns\":69,\"user_bloods\":0,\"system_bloods\":0,\"challenge_bloods\":0,\"team\":{\"id\":4231,\"name\":\"LHIND\",\"ranking\":218,\"avatar\":\"\\/teams\\/dd1016d"
+    "snippet": "{\"profile\":{\"id\":378794,\"sso_id\":true,\"name\":\"0x01r3ddw4rf\",\"system_owns\":55,\"user_owns\":69,\"user_bloods\":0,\"system_bloods\":0,\"challenge_bloods\":0,\"team\":{\"id\":4231,\"name\":\"LHIND\",\"ranking\":225,\"avatar\":\"\\/teams\\/dd1016d"
   },
   "prolabs": {
     "ok": true,
@@ -33,14 +33,14 @@
       "url": "https://labs.hackthebox.com/api/v4/season/user/378794/ranks",
       "status": 200,
       "content_type": "application/json",
-      "snippet": "{\"data\":[{\"league\":\"Ruby\",\"rank\":2277,\"next_rank\":{\"id\":4,\"title\":\"Platinum\",\"requirement\":65},\"total_ranks\":10242,\"rank_suffix\":\"th\",\"total_season_points\":315,\"flags_to_next_rank\":{\"obtained\":0,\"total\":6},\"total_season_"
+      "snippet": "{\"data\":[{\"league\":\"Ruby\",\"rank\":2301,\"next_rank\":{\"id\":4,\"title\":\"Platinum\",\"requirement\":65},\"total_ranks\":10383,\"rank_suffix\":\"st\",\"total_season_points\":315,\"flags_to_next_rank\":{\"obtained\":0,\"total\":6},\"total_season_"
     },
     "rank_by_id": {
       "ok": true,
       "url": "https://labs.hackthebox.com/api/v4/season/user/rank/13",
       "status": 200,
       "content_type": "application/json",
-      "snippet": "{\"data\":{\"league\":\"Ruby\",\"rank\":2277,\"next_rank\":{\"id\":4,\"title\":\"Platinum\",\"requirement\":65},\"total_ranks\":10242,\"rank_suffix\":\"th\",\"total_season_points\":315,\"flags_to_next_rank\":{\"obtained\":0,\"total\":6},\"total_season_f"
+      "snippet": "{\"data\":{\"league\":\"Ruby\",\"rank\":2301,\"next_rank\":{\"id\":4,\"title\":\"Platinum\",\"requirement\":65},\"total_ranks\":10383,\"rank_suffix\":\"st\",\"total_season_points\":315,\"flags_to_next_rank\":{\"obtained\":0,\"total\":6},\"total_season_f"
     }
   },
   "extras": {
@@ -62,8 +62,8 @@
     "challenges": "23/189",
     "season_name": "Season 10",
     "season_league": "Ruby",
-    "season_rank": "2277",
-    "season_total_ranks": "10242",
+    "season_rank": "2301",
+    "season_total_ranks": "10383",
     "season_points": "315",
     "season_flags": "11/26",
     "season_next_flags": "0/6"
