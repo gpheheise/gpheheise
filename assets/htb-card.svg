@@ -131,7 +131,7 @@
   <text class="t v" x="28" y="145">279</text>
 
   <text class="t k" x="198" y="120">GLOBAL</text>
-  <text class="t v" x="198" y="145">#703</text>
+  <text class="t v" x="198" y="145">#700</text>
 
   <text class="t k" x="368" y="120">USER OWNS</text>
   <text class="t v" x="368" y="145">69</text>
@@ -143,7 +143,7 @@
   <text class="t v" x="748" y="145">2</text>
 
   <text class="t k" x="928" y="120">CHALLENGES</text>
-  <text class="t v" x="928" y="145">23/190</text>
+  <text class="t v" x="928" y="145">23/191</text>
 
   <text class="t k" x="28" y="195">PRO LABS</text>
   <text class="t v" x="28" y="220">11/33</text>
@@ -153,12 +153,12 @@
 
   <text class="t k" x="508" y="195">SEASON</text>
   <text class="t s" x="508" y="218">Season 10 · Ruby</text>
-  <text class="t v" x="508" y="240">#2684/11063 · 315 pts · 11/26 flags</text>
+  <text class="t v" x="508" y="240">#2717/11106 · 315 pts · 11/26 flags</text>
   <text class="t s muted" x="508" y="262">next rank flags: 0/6</text>
 
   <text class="t k" x="28" y="305">COMPLETED PRO LABS</text>
   <text class="t s" x="28" y="325">Dante · P.O.O · Alchemy · Zephyr · Xen · Offshore · RastaLabs · Intercept · Kaiju · Klendathu</text>
   <text class="t s" x="28" y="343">Heron</text>
 
-  <text class="t k muted" x="28" y="380">updated 2026-04-03 07:02 UTC</text>
+  <text class="t k muted" x="28" y="380">updated 2026-04-04 06:54 UTC</text>
 </svg>
