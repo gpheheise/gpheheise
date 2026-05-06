@@ -4,7 +4,7 @@
     "url": "https://labs.hackthebox.com/api/v4/user/profile/basic/378794",
     "status": 200,
     "content_type": "application/json",
-    "snippet": "{\"profile\":{\"id\":378794,\"sso_id\":true,\"name\":\"0x01r3ddw4rf\",\"system_owns\":55,\"user_owns\":69,\"user_bloods\":0,\"system_bloods\":0,\"challenge_bloods\":0,\"team\":{\"id\":4231,\"name\":\"LHIND\",\"ranking\":179,\"avatar\":\"\\/teams\\/dd1016d"
+    "snippet": "{\"profile\":{\"id\":378794,\"sso_id\":true,\"name\":\"0x01r3ddw4rf\",\"system_owns\":55,\"user_owns\":69,\"user_bloods\":0,\"system_bloods\":0,\"challenge_bloods\":0,\"team\":{\"id\":4231,\"name\":\"LHIND\",\"ranking\":177,\"avatar\":\"\\/teams\\/dd1016d"
   },
   "prolabs": {
     "ok": true,
@@ -25,7 +25,7 @@
     "url": "https://labs.hackthebox.com/api/v4/challenge/list",
     "status": 200,
     "content_type": "application/json",
-    "snippet": "{\"challenges\":[{\"id\":39,\"name\":\"Reminiscent\",\"url_name\":\"reminiscent\",\"retired\":false,\"difficulty\":\"Easy\",\"avg_difficulty\":39,\"points\":\"30\",\"static_points\":\"30\",\"difficulty_chart\":{\"counterCake\":1204,\"counterVeryEasy\":13"
+    "snippet": "{\"challenges\":[{\"id\":39,\"name\":\"Reminiscent\",\"url_name\":\"reminiscent\",\"retired\":false,\"difficulty\":\"Easy\",\"avg_difficulty\":39,\"points\":\"30\",\"static_points\":\"30\",\"difficulty_chart\":{\"counterCake\":1206,\"counterVeryEasy\":13"
   },
   "season": {
     "ranks": {
@@ -33,14 +33,14 @@
       "url": "https://labs.hackthebox.com/api/v4/season/user/378794/ranks",
       "status": 200,
       "content_type": "application/json",
-      "snippet": "{\"data\":[{\"league\":\"Ruby\",\"rank\":3268,\"next_rank\":{\"id\":4,\"title\":\"Platinum\",\"requirement\":65},\"total_ranks\":12294,\"rank_suffix\":\"th\",\"total_season_points\":315,\"flags_to_next_rank\":null,\"total_season_flags\":{\"obtained\":1"
+      "snippet": "{\"data\":[{\"league\":null,\"rank\":null,\"next_rank\":{\"id\":1,\"title\":\"Bronze\",\"requirement\":0},\"total_ranks\":null,\"rank_suffix\":null,\"total_season_points\":0,\"flags_to_next_rank\":null,\"total_season_flags\":{\"obtained\":0,\"total\""
     },
     "rank_by_id": {
       "ok": true,
-      "url": "https://labs.hackthebox.com/api/v4/season/user/rank/13",
+      "url": "https://labs.hackthebox.com/api/v4/season/user/rank/15",
       "status": 200,
       "content_type": "application/json",
-      "snippet": "{\"data\":{\"league\":\"Ruby\",\"rank\":3268,\"next_rank\":{\"id\":4,\"title\":\"Platinum\",\"requirement\":65},\"total_ranks\":12294,\"rank_suffix\":\"th\",\"total_season_points\":315,\"flags_to_next_rank\":{\"obtained\":0,\"total\":6},\"total_season_f"
+      "snippet": "{\"data\":{\"league\":null,\"rank\":null,\"next_rank\":{\"id\":1,\"title\":\"Bronze\",\"requirement\":0},\"total_ranks\":null,\"rank_suffix\":null,\"total_season_points\":0,\"flags_to_next_rank\":{\"obtained\":0,\"total\":1},\"total_season_flags\":{\""
     }
   },
   "extras": {
@@ -60,12 +60,12 @@
       "Heron"
     ],
     "challenges": "23/192",
-    "season_name": "Season 10",
-    "season_league": "Ruby",
-    "season_rank": "3268",
-    "season_total_ranks": "12294",
-    "season_points": "315",
-    "season_flags": "11/26",
-    "season_next_flags": "0/6"
+    "season_name": "Season 11",
+    "season_league": "\u2014",
+    "season_rank": "\u2014",
+    "season_total_ranks": "\u2014",
+    "season_points": "0",
+    "season_flags": "0/24",
+    "season_next_flags": "0/1"
   }
 }
