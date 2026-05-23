@@ -4,7 +4,7 @@
     "url": "https://labs.hackthebox.com/api/v4/user/profile/basic/378794",
     "status": 200,
     "content_type": "application/json",
-    "snippet": "{\"profile\":{\"id\":378794,\"sso_id\":true,\"name\":\"0x01r3ddw4rf\",\"system_owns\":55,\"user_owns\":69,\"user_bloods\":0,\"system_bloods\":0,\"challenge_bloods\":0,\"team\":{\"id\":4231,\"name\":\"LHIND\",\"ranking\":186,\"avatar\":\"\\/teams\\/dd1016d"
+    "snippet": "{\"profile\":{\"id\":378794,\"sso_id\":true,\"name\":\"0x01r3ddw4rf\",\"system_owns\":55,\"user_owns\":69,\"user_bloods\":0,\"system_bloods\":0,\"challenge_bloods\":0,\"team\":{\"id\":4231,\"name\":\"LHIND\",\"ranking\":183,\"avatar\":\"\\/teams\\/dd1016d"
   },
   "prolabs": {
     "ok": true,
@@ -25,7 +25,7 @@
     "url": "https://labs.hackthebox.com/api/v4/challenge/list",
     "status": 200,
     "content_type": "application/json",
-    "snippet": "{\"challenges\":[{\"id\":39,\"name\":\"Reminiscent\",\"url_name\":\"reminiscent\",\"retired\":false,\"difficulty\":\"Easy\",\"avg_difficulty\":39,\"points\":\"20\",\"static_points\":\"20\",\"difficulty_chart\":{\"counterCake\":1207,\"counterVeryEasy\":13"
+    "snippet": "{\"challenges\":[{\"id\":59,\"name\":\"Cryptohorrific\",\"url_name\":\"cryptohorrific\",\"retired\":false,\"difficulty\":\"Medium\",\"avg_difficulty\":45,\"points\":\"30\",\"static_points\":\"30\",\"difficulty_chart\":{\"counterCake\":399,\"counterVeryE"
   },
   "season": {
     "ranks": {
@@ -59,7 +59,7 @@
       "Klendathu",
       "Heron"
     ],
-    "challenges": "23/192",
+    "challenges": "22/189",
     "season_name": "Season 11",
     "season_league": "\u2014",
     "season_rank": "\u2014",
