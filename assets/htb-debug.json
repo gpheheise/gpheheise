@@ -4,7 +4,7 @@
     "url": "https://labs.hackthebox.com/api/v4/user/profile/basic/378794",
     "status": 200,
     "content_type": "application/json",
-    "snippet": "{\"profile\":{\"id\":378794,\"sso_id\":true,\"name\":\"0x01r3ddw4rf\",\"system_owns\":55,\"user_owns\":69,\"user_bloods\":0,\"system_bloods\":0,\"challenge_bloods\":0,\"team\":{\"id\":4231,\"name\":\"LHIND\",\"ranking\":183,\"avatar\":\"\\/teams\\/dd1016d"
+    "snippet": "{\"profile\":{\"id\":378794,\"sso_id\":true,\"name\":\"0x01r3ddw4rf\",\"system_owns\":55,\"user_owns\":69,\"user_bloods\":0,\"system_bloods\":0,\"challenge_bloods\":0,\"team\":{\"id\":4231,\"name\":\"LHIND\",\"ranking\":199,\"avatar\":\"\\/teams\\/dd1016d"
   },
   "prolabs": {
     "ok": true,
@@ -33,7 +33,7 @@
       "url": "https://labs.hackthebox.com/api/v4/season/user/378794/ranks",
       "status": 200,
       "content_type": "application/json",
-      "snippet": "{\"data\":[{\"league\":null,\"rank\":null,\"next_rank\":{\"id\":1,\"title\":\"Bronze\",\"requirement\":0},\"total_ranks\":null,\"rank_suffix\":null,\"total_season_points\":0,\"flags_to_next_rank\":null,\"total_season_flags\":{\"obtained\":0,\"total\""
+      "snippet": "{\"data\":[{\"league\":null,\"rank\":null,\"next_rank\":{\"id\":1,\"title\":\"Bronze\",\"requirement\":0},\"total_ranks\":null,\"rank_suffix\":null,\"total_season_points\":0,\"flags_to_next_rank\":{\"obtained\":0,\"total\":1},\"total_season_flags\":{"
     },
     "rank_by_id": {
       "ok": true,
