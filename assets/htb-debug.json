@@ -4,7 +4,7 @@
     "url": "https://labs.hackthebox.com/api/v4/user/profile/basic/378794",
     "status": 200,
     "content_type": "application/json",
-    "snippet": "{\"profile\":{\"id\":378794,\"sso_id\":true,\"name\":\"0x01r3ddw4rf\",\"system_owns\":55,\"user_owns\":69,\"user_bloods\":0,\"system_bloods\":0,\"challenge_bloods\":0,\"team\":{\"id\":4231,\"name\":\"LHIND\",\"ranking\":205,\"avatar\":\"\\/teams\\/dd1016d"
+    "snippet": "{\"profile\":{\"id\":378794,\"sso_id\":true,\"name\":\"0x01r3ddw4rf\",\"system_owns\":55,\"user_owns\":69,\"user_bloods\":0,\"system_bloods\":0,\"challenge_bloods\":0,\"team\":{\"id\":4231,\"name\":\"LHIND\",\"ranking\":207,\"avatar\":\"\\/teams\\/dd1016d"
   },
   "prolabs": {
     "ok": true,
@@ -25,7 +25,7 @@
     "url": "https://labs.hackthebox.com/api/v4/challenge/list",
     "status": 200,
     "content_type": "application/json",
-    "snippet": "{\"challenges\":[{\"id\":59,\"name\":\"Cryptohorrific\",\"url_name\":\"cryptohorrific\",\"retired\":false,\"difficulty\":\"Medium\",\"avg_difficulty\":45,\"points\":\"30\",\"static_points\":\"30\",\"difficulty_chart\":{\"counterCake\":399,\"counterVeryE"
+    "snippet": "{\"challenges\":[{\"id\":59,\"name\":\"Cryptohorrific\",\"url_name\":\"cryptohorrific\",\"retired\":false,\"difficulty\":\"Medium\",\"avg_difficulty\":45,\"points\":\"30\",\"static_points\":\"30\",\"difficulty_chart\":{\"counterCake\":400,\"counterVeryE"
   },
   "season": {
     "ranks": {
