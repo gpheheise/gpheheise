@@ -142,6 +142,7 @@ If you’re organizing a meetup or conference, I’m open to speaking opportunit
   <img src="https://img.youtube.com/vi/_U2GyyRO0C0/maxresdefault.jpg" width="720" alt="Watch the BSides Dresden Talk"/>
 </a>
 
+▶️ Full recording available on YouTube
 
 <div align="center">
   <img src="assets/confs/bsidesdresden.png" height="84" alt="BSides Dresden" />
