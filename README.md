@@ -138,7 +138,9 @@ If you’re organizing a meetup or conference, I’m open to speaking opportunit
 ### 🔴 BSides Tirana (2025)  
 **Breaking Bad AD — What Red Teams Wish You'd Fix Yesterday**
 
-*(Recording coming soon)*
+<a href="https://www.youtube.com/watch?v=_U2GyyRO0C0" target="_blank">
+  <img src="https://img.youtube.com/vi/_U2GyyRO0C0/maxresdefault.jpg" width="720" alt="Watch the BSides Dresden Talk"/>
+</a>
 
 
 <div align="center">
