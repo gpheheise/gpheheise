@@ -4,7 +4,7 @@
     "url": "https://labs.hackthebox.com/api/v4/user/profile/basic/378794",
     "status": 200,
     "content_type": "application/json",
-    "snippet": "{\"profile\":{\"id\":378794,\"sso_id\":true,\"name\":\"0x01r3ddw4rf\",\"system_owns\":56,\"user_owns\":71,\"user_bloods\":0,\"system_bloods\":0,\"challenge_bloods\":0,\"team\":{\"id\":4231,\"name\":\"LHIND\",\"ranking\":388,\"avatar\":\"\\/teams\\/dd1016d"
+    "snippet": "{\"profile\":{\"id\":378794,\"sso_id\":true,\"name\":\"0x01r3ddw4rf\",\"system_owns\":57,\"user_owns\":72,\"user_bloods\":0,\"system_bloods\":0,\"challenge_bloods\":0,\"team\":{\"id\":4231,\"name\":\"LHIND\",\"ranking\":390,\"avatar\":\"\\/teams\\/dd1016d"
   },
   "prolabs": {
     "ok": true,
@@ -33,14 +33,14 @@
       "url": "https://labs.hackthebox.com/api/v4/season/user/378794/ranks",
       "status": 200,
       "content_type": "application/json",
-      "snippet": "{\"data\":[{\"league\":\"Bronze\",\"rank\":12120,\"next_rank\":{\"id\":2,\"title\":\"Silver\",\"requirement\":15},\"total_ranks\":12140,\"rank_suffix\":\"th\",\"total_season_points\":20,\"flags_to_next_rank\":{\"obtained\":1,\"total\":4},\"total_season_"
+      "snippet": "{\"data\":[{\"league\":\"Bronze\",\"rank\":12185,\"next_rank\":{\"id\":2,\"title\":\"Silver\",\"requirement\":15},\"total_ranks\":12224,\"rank_suffix\":\"th\",\"total_season_points\":20,\"flags_to_next_rank\":{\"obtained\":1,\"total\":4},\"total_season_"
     },
     "rank_by_id": {
       "ok": true,
       "url": "https://labs.hackthebox.com/api/v4/season/user/rank/15",
       "status": 200,
       "content_type": "application/json",
-      "snippet": "{\"data\":{\"league\":\"Bronze\",\"rank\":12120,\"next_rank\":{\"id\":2,\"title\":\"Silver\",\"requirement\":15},\"total_ranks\":12140,\"rank_suffix\":\"th\",\"total_season_points\":20,\"flags_to_next_rank\":{\"obtained\":1,\"total\":4},\"total_season_f"
+      "snippet": "{\"data\":{\"league\":\"Bronze\",\"rank\":12185,\"next_rank\":{\"id\":2,\"title\":\"Silver\",\"requirement\":15},\"total_ranks\":12224,\"rank_suffix\":\"th\",\"total_season_points\":20,\"flags_to_next_rank\":{\"obtained\":1,\"total\":4},\"total_season_f"
     }
   },
   "extras": {
@@ -62,8 +62,8 @@
     "challenges": "22/192",
     "season_name": "Season 11",
     "season_league": "Bronze",
-    "season_rank": "12120",
-    "season_total_ranks": "12140",
+    "season_rank": "12185",
+    "season_total_ranks": "12224",
     "season_points": "20",
     "season_flags": "1/26",
     "season_next_flags": "1/4"
