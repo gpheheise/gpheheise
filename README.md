@@ -38,8 +38,8 @@ I focus on real-world exploitation, responsible disclosure, and building practic
 
 | Event | Location | Date |
 |-------|----------|------|
-| BSides Frankfurt |  | 10th September 2026
-| HH.Security #22 | Lotto24 AG/Hamburg |16th April 2026 |
+| BSides Frankfurt | FRA | 10th September 2026
+| HH.Security #22 | HAM |16th April 2026 |
 
 
 </td>
