@@ -12,8 +12,8 @@ I focus on real-world exploitation, responsible disclosure, and building practic
 
   <h2>📍 Meet me next</h2>
 <h3>
-  🇨🇭 <strong style="font-size: 1.4em;">BSides Frankfurt 10th September 2026)<br/>
-  <sub>March</sub>
+  🇨🇭 <strong style="font-size: 1.4em;">BSides Frankfurt )<br/>
+  <sub>10th September 2026</sub>
 </h3>
   <a href="https://insomnihack.ch/" target="_blank" rel="noopener">
     <img src="assets/insomnihack-logo.png" 
