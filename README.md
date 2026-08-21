@@ -15,8 +15,8 @@ I focus on real-world exploitation, responsible disclosure, and building practic
   🇨🇭 <strong style="font-size: 1.4em;">BSides Frankfurt<br/>
   <sub>10th September 2026</sub>
 </h3>
-  <a href="https://insomnihack.ch/" target="_blank" rel="noopener">
-    <img src="assets/insomnihack-logo.png" 
+  <a href="https://bsidesfrankfurt.org/schedule/#" target="_blank" rel="noopener">
+    <img src="assets/confs/sticker3-CMYK.jpg" 
          alt="Insomni'hack Lausanne" 
          width="420"/>
   </a>
