@@ -12,7 +12,7 @@ I focus on real-world exploitation, responsible disclosure, and building practic
 
   <h2>📍 Meet me next</h2>
 <h3>
-  🇨🇭 <strong style="font-size: 1.4em;">Insomni'hack — Lausanne</strong> (March 2026)<br/>
+  🇨🇭 <strong style="font-size: 1.4em;">BSides Frankfurt 10th September 2026)<br/>
   <sub>March</sub>
 </h3>
   <a href="https://insomnihack.ch/" target="_blank" rel="noopener">
@@ -38,7 +38,7 @@ I focus on real-world exploitation, responsible disclosure, and building practic
 
 | Event | Location | Date |
 |-------|----------|------|
-| Bsides Frankfurt | 10th September 2026 |
+| BSides Frankfurt |  | 10th September 2026
 | HH.Security #22 | Lotto24 AG/Hamburg |16th April 2026 |
 
 
@@ -52,7 +52,7 @@ I focus on real-world exploitation, responsible disclosure, and building practic
 
 | Event | Location | Date |
 |-------|----------|------|
-| Bsides Frankfurt | 10th September 2026 |
+| BSides Frankfurt | 10th September 2026 |
 | Elbsides | Hamburg 🇩🇪 | 5th June 2026 |
 | HH.Security #22 | Lotto24 AG/Hamburg |16th April 2026 |
 | Insomni'hack | Lausanne 🇨🇭 | 18/19th March 2026 |
