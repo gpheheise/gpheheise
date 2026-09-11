@@ -4,7 +4,7 @@
     "url": "https://labs.hackthebox.com/api/v4/user/profile/basic/378794",
     "status": 200,
     "content_type": "application/json",
-    "snippet": "{\"profile\":{\"id\":378794,\"sso_id\":true,\"name\":\"0x01r3ddw4rf\",\"system_owns\":70,\"user_owns\":86,\"user_bloods\":0,\"system_bloods\":0,\"challenge_bloods\":0,\"team\":{\"id\":4231,\"name\":\"LHIND\",\"ranking\":258,\"avatar\":\"\\/teams\\/dd1016d"
+    "snippet": "{\"profile\":{\"id\":378794,\"sso_id\":true,\"name\":\"0x01r3ddw4rf\",\"system_owns\":70,\"user_owns\":86,\"user_bloods\":0,\"system_bloods\":0,\"challenge_bloods\":0,\"team\":{\"id\":4231,\"name\":\"LHIND\",\"ranking\":260,\"avatar\":\"\\/teams\\/dd1016d"
   },
   "prolabs": {
     "ok": true,
@@ -33,14 +33,14 @@
       "url": "https://labs.hackthebox.com/api/v4/season/user/378794/ranks",
       "status": 200,
       "content_type": "application/json",
-      "snippet": "{\"data\":[{\"league\":\"Silver\",\"rank\":6912,\"next_rank\":{\"id\":3,\"title\":\"Ruby\",\"requirement\":40},\"total_ranks\":12396,\"rank_suffix\":\"th\",\"total_season_points\":110,\"flags_to_next_rank\":null,\"total_season_flags\":{\"obtained\":4,\""
+      "snippet": "{\"data\":[{\"league\":null,\"rank\":null,\"next_rank\":{\"id\":1,\"title\":\"Bronze\",\"requirement\":0},\"total_ranks\":null,\"rank_suffix\":null,\"total_season_points\":0,\"flags_to_next_rank\":null,\"total_season_flags\":{\"obtained\":0,\"total\""
     },
     "rank_by_id": {
       "ok": true,
-      "url": "https://labs.hackthebox.com/api/v4/season/user/rank/15",
+      "url": "https://labs.hackthebox.com/api/v4/season/user/rank/21",
       "status": 200,
       "content_type": "application/json",
-      "snippet": "{\"data\":{\"league\":\"Silver\",\"rank\":6912,\"next_rank\":{\"id\":3,\"title\":\"Ruby\",\"requirement\":40},\"total_ranks\":12396,\"rank_suffix\":\"th\",\"total_season_points\":110,\"flags_to_next_rank\":{\"obtained\":0,\"total\":7},\"total_season_fla"
+      "snippet": "{\"data\":{\"league\":null,\"rank\":null,\"next_rank\":{\"id\":1,\"title\":\"Bronze\",\"requirement\":0},\"total_ranks\":null,\"rank_suffix\":null,\"total_season_points\":0,\"flags_to_next_rank\":{\"obtained\":0,\"total\":1},\"total_season_flags\":{\""
     }
   },
   "extras": {
@@ -60,12 +60,12 @@
       "Heron"
     ],
     "challenges": "22/198",
-    "season_name": "Season 11",
-    "season_league": "Silver",
-    "season_rank": "6912",
-    "season_total_ranks": "12396",
-    "season_points": "110",
-    "season_flags": "4/26",
-    "season_next_flags": "0/7"
+    "season_name": "Season 12",
+    "season_league": "\u2014",
+    "season_rank": "\u2014",
+    "season_total_ranks": "\u2014",
+    "season_points": "0",
+    "season_flags": "0/18",
+    "season_next_flags": "0/1"
   }
 }
