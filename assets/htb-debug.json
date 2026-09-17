@@ -25,7 +25,7 @@
     "url": "https://labs.hackthebox.com/api/v4/challenge/list",
     "status": 200,
     "content_type": "application/json",
-    "snippet": "{\"challenges\":[{\"id\":72,\"name\":\"Debugme\",\"url_name\":\"debugme\",\"retired\":false,\"difficulty\":\"Medium\",\"avg_difficulty\":47,\"points\":\"30\",\"static_points\":\"30\",\"difficulty_chart\":{\"counterCake\":282,\"counterVeryEasy\":242,\"coun"
+    "snippet": "{\"challenges\":[{\"id\":72,\"name\":\"Debugme\",\"url_name\":\"debugme\",\"retired\":false,\"difficulty\":\"Medium\",\"avg_difficulty\":47,\"points\":\"30\",\"static_points\":\"30\",\"difficulty_chart\":{\"counterCake\":282,\"counterVeryEasy\":243,\"coun"
   },
   "season": {
     "ranks": {
