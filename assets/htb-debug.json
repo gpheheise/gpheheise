@@ -4,7 +4,7 @@
     "url": "https://labs.hackthebox.com/api/v4/user/profile/basic/378794",
     "status": 200,
     "content_type": "application/json",
-    "snippet": "{\"profile\":{\"id\":378794,\"sso_id\":true,\"name\":\"0x01r3ddw4rf\",\"system_owns\":73,\"user_owns\":89,\"user_bloods\":0,\"system_bloods\":0,\"challenge_bloods\":0,\"team\":{\"id\":4231,\"name\":\"LHIND\",\"ranking\":198,\"avatar\":\"\\/teams\\/dd1016d"
+    "snippet": "{\"profile\":{\"id\":378794,\"sso_id\":true,\"name\":\"0x01r3ddw4rf\",\"system_owns\":73,\"user_owns\":89,\"user_bloods\":0,\"system_bloods\":0,\"challenge_bloods\":0,\"team\":{\"id\":4231,\"name\":\"LHIND\",\"ranking\":200,\"avatar\":\"\\/teams\\/dd1016d"
   },
   "prolabs": {
     "ok": true,
@@ -33,14 +33,14 @@
       "url": "https://labs.hackthebox.com/api/v4/season/user/378794/ranks",
       "status": 200,
       "content_type": "application/json",
-      "snippet": "{\"data\":[{\"league\":\"Silver\",\"rank\":2771,\"next_rank\":{\"id\":3,\"title\":\"Ruby\",\"requirement\":40},\"total_ranks\":5420,\"rank_suffix\":\"st\",\"total_season_points\":110,\"flags_to_next_rank\":{\"obtained\":1,\"total\":5},\"total_season_fla"
+      "snippet": "{\"data\":[{\"league\":\"Silver\",\"rank\":2783,\"next_rank\":{\"id\":3,\"title\":\"Ruby\",\"requirement\":40},\"total_ranks\":5459,\"rank_suffix\":\"rd\",\"total_season_points\":110,\"flags_to_next_rank\":{\"obtained\":1,\"total\":5},\"total_season_fla"
     },
     "rank_by_id": {
       "ok": true,
       "url": "https://labs.hackthebox.com/api/v4/season/user/rank/21",
       "status": 200,
       "content_type": "application/json",
-      "snippet": "{\"data\":{\"league\":\"Silver\",\"rank\":2771,\"next_rank\":{\"id\":3,\"title\":\"Ruby\",\"requirement\":40},\"total_ranks\":5420,\"rank_suffix\":\"st\",\"total_season_points\":110,\"flags_to_next_rank\":{\"obtained\":1,\"total\":5},\"total_season_flag"
+      "snippet": "{\"data\":{\"league\":\"Silver\",\"rank\":2783,\"next_rank\":{\"id\":3,\"title\":\"Ruby\",\"requirement\":40},\"total_ranks\":5459,\"rank_suffix\":\"rd\",\"total_season_points\":110,\"flags_to_next_rank\":{\"obtained\":1,\"total\":5},\"total_season_flag"
     }
   },
   "extras": {
@@ -62,8 +62,8 @@
     "challenges": "21/198",
     "season_name": "Season 12",
     "season_league": "Silver",
-    "season_rank": "2771",
-    "season_total_ranks": "5420",
+    "season_rank": "2783",
+    "season_total_ranks": "5459",
     "season_points": "110",
     "season_flags": "4/18",
     "season_next_flags": "1/5"
