@@ -11,7 +11,7 @@
     "url": "https://labs.hackthebox.com/api/v4/prolabs",
     "status": 200,
     "content_type": "application/json",
-    "snippet": "{\"status\":true,\"data\":{\"count\":33,\"labs\":[{\"id\":25,\"name\":\"Mythical\",\"release_at\":\"2025-09-30T13:05:24.000000Z\",\"pro_machines_count\":3,\"pro_flags_count\":3,\"state\":\"free\",\"mini\":true,\"identifier\":\"MYTHICAL\",\"content_id\":\""
+    "snippet": "{\"status\":true,\"data\":{\"count\":33,\"labs\":[{\"id\":22,\"name\":\"Puppet\",\"release_at\":\"2025-09-30T13:03:32.000000Z\",\"pro_machines_count\":3,\"pro_flags_count\":4,\"state\":\"free\",\"mini\":true,\"identifier\":\"PUPPET\",\"content_id\":\"9f30"
   },
   "fortresses": {
     "ok": true,
@@ -25,7 +25,7 @@
     "url": "https://labs.hackthebox.com/api/v4/challenge/list",
     "status": 200,
     "content_type": "application/json",
-    "snippet": "{\"challenges\":[{\"id\":72,\"name\":\"Debugme\",\"url_name\":\"debugme\",\"retired\":false,\"difficulty\":\"Medium\",\"avg_difficulty\":47,\"points\":\"30\",\"static_points\":\"30\",\"difficulty_chart\":{\"counterCake\":283,\"counterVeryEasy\":245,\"coun"
+    "snippet": "{\"challenges\":[{\"id\":72,\"name\":\"Debugme\",\"url_name\":\"debugme\",\"retired\":false,\"difficulty\":\"Medium\",\"avg_difficulty\":47,\"points\":\"30\",\"static_points\":\"30\",\"difficulty_chart\":{\"counterCake\":284,\"counterVeryEasy\":245,\"coun"
   },
   "season": {
     "ranks": {
@@ -33,14 +33,14 @@
       "url": "https://labs.hackthebox.com/api/v4/season/user/378794/ranks",
       "status": 200,
       "content_type": "application/json",
-      "snippet": "{\"data\":[{\"league\":\"Silver\",\"rank\":3074,\"next_rank\":{\"id\":3,\"title\":\"Ruby\",\"requirement\":40},\"total_ranks\":5724,\"rank_suffix\":\"th\",\"total_season_points\":110,\"flags_to_next_rank\":{\"obtained\":1,\"total\":5},\"total_season_fla"
+      "snippet": "{\"data\":[{\"league\":\"Silver\",\"rank\":3128,\"next_rank\":{\"id\":3,\"title\":\"Ruby\",\"requirement\":40},\"total_ranks\":5778,\"rank_suffix\":\"th\",\"total_season_points\":110,\"flags_to_next_rank\":{\"obtained\":1,\"total\":5},\"total_season_fla"
     },
     "rank_by_id": {
       "ok": true,
       "url": "https://labs.hackthebox.com/api/v4/season/user/rank/21",
       "status": 200,
       "content_type": "application/json",
-      "snippet": "{\"data\":{\"league\":\"Silver\",\"rank\":3074,\"next_rank\":{\"id\":3,\"title\":\"Ruby\",\"requirement\":40},\"total_ranks\":5724,\"rank_suffix\":\"th\",\"total_season_points\":110,\"flags_to_next_rank\":{\"obtained\":1,\"total\":5},\"total_season_flag"
+      "snippet": "{\"data\":{\"league\":\"Silver\",\"rank\":3128,\"next_rank\":{\"id\":3,\"title\":\"Ruby\",\"requirement\":40},\"total_ranks\":5778,\"rank_suffix\":\"th\",\"total_season_points\":110,\"flags_to_next_rank\":{\"obtained\":1,\"total\":5},\"total_season_flag"
     }
   },
   "extras": {
@@ -49,6 +49,7 @@
     "completed": [
       "Dante",
       "P.O.O",
+      "Heron",
       "Alchemy",
       "Zephyr",
       "Xen",
@@ -56,14 +57,13 @@
       "RastaLabs",
       "Intercept",
       "Kaiju",
-      "Klendathu",
-      "Heron"
+      "Klendathu"
     ],
     "challenges": "19/198",
     "season_name": "Season 12",
     "season_league": "Silver",
-    "season_rank": "3074",
-    "season_total_ranks": "5724",
+    "season_rank": "3128",
+    "season_total_ranks": "5778",
     "season_points": "110",
     "season_flags": "4/18",
     "season_next_flags": "1/5"
