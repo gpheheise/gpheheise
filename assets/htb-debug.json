@@ -33,14 +33,14 @@
       "url": "https://labs.hackthebox.com/api/v4/season/user/378794/ranks",
       "status": 200,
       "content_type": "application/json",
-      "snippet": "{\"data\":[{\"league\":\"Silver\",\"rank\":3174,\"next_rank\":{\"id\":3,\"title\":\"Ruby\",\"requirement\":40},\"total_ranks\":5829,\"rank_suffix\":\"th\",\"total_season_points\":110,\"flags_to_next_rank\":{\"obtained\":1,\"total\":5},\"total_season_fla"
+      "snippet": "{\"data\":[{\"league\":\"Silver\",\"rank\":3195,\"next_rank\":{\"id\":3,\"title\":\"Ruby\",\"requirement\":40},\"total_ranks\":5881,\"rank_suffix\":\"th\",\"total_season_points\":110,\"flags_to_next_rank\":{\"obtained\":1,\"total\":5},\"total_season_fla"
     },
     "rank_by_id": {
       "ok": true,
       "url": "https://labs.hackthebox.com/api/v4/season/user/rank/21",
       "status": 200,
       "content_type": "application/json",
-      "snippet": "{\"data\":{\"league\":\"Silver\",\"rank\":3174,\"next_rank\":{\"id\":3,\"title\":\"Ruby\",\"requirement\":40},\"total_ranks\":5829,\"rank_suffix\":\"th\",\"total_season_points\":110,\"flags_to_next_rank\":{\"obtained\":1,\"total\":5},\"total_season_flag"
+      "snippet": "{\"data\":{\"league\":\"Silver\",\"rank\":3195,\"next_rank\":{\"id\":3,\"title\":\"Ruby\",\"requirement\":40},\"total_ranks\":5881,\"rank_suffix\":\"th\",\"total_season_points\":110,\"flags_to_next_rank\":{\"obtained\":1,\"total\":5},\"total_season_flag"
     }
   },
   "extras": {
@@ -62,8 +62,8 @@
     "challenges": "19/198",
     "season_name": "Season 12",
     "season_league": "Silver",
-    "season_rank": "3174",
-    "season_total_ranks": "5829",
+    "season_rank": "3195",
+    "season_total_ranks": "5881",
     "season_points": "110",
     "season_flags": "4/18",
     "season_next_flags": "1/5"
