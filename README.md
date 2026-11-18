@@ -38,8 +38,8 @@ I focus on real-world exploitation, responsible disclosure, and building practic
 
 | Event | Location | Date |
 |-------|----------|------|
+| IATA Cyber Security Forum | Geneva 🇨🇭 | 27/28th October 2026 |
 | BSides Frankfurt | FRA | 10th September 2026
-| HH.Security #22 | HAM |16th April 2026 |
 
 
 </td>
@@ -52,6 +52,7 @@ I focus on real-world exploitation, responsible disclosure, and building practic
 
 | Event | Location | Date |
 |-------|----------|------|
+| IATA Cyber Security Forum | Geneva 🇨🇭 | 27/28th October 2026 |
 | BSides Frankfurt | 10th September 2026 |
 | Elbsides | Hamburg 🇩🇪 | 5th June 2026 |
 | HH.Security #22 | Lotto24 AG/Hamburg |16th April 2026 |
